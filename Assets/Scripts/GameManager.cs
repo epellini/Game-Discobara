@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour
     private float playerMoveDistance = 1f;
     private bool isFirstPlatform = true;
     public Transform PlatformPreviewPrefab;
+    public GameObject gameOverPanel;
+
 
     void Start()
     {
@@ -34,7 +36,7 @@ public class GameManager : MonoBehaviour
         // Handle Game Over state
         if (CurrentState == GameState.GameOver)
         {
-           
+
             return; // Skip the rest of the update if the game is over
         }
 
@@ -250,9 +252,13 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Game Over - Player fell");
         CurrentState = GameState.GameOver;
+
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
         // Here you can add more game over logic or UI updates
 
-        
     }
 
 }

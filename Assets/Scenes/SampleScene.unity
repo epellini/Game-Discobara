@@ -620,6 +620,7 @@ MonoBehaviour:
     type: 3}
   PlatformPreviewPrefab: {fileID: 4266329005899544926, guid: 6e89b5e3b4802df4f9720ec0ccc204c0,
     type: 3}
+  gameOverPanel: {fileID: 1126320018}
 --- !u!4 &1040195123
 Transform:
   m_ObjectHideFlags: 0
