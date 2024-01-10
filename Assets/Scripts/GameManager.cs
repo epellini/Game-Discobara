@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
     public enum GameState
     {
         ReadyForInput,
@@ -11,10 +12,10 @@ public class GameManager : MonoBehaviour
         GameOver
     }
 
-    [SerializeField]
-    private Transform Player;
+    [SerializeField] private Transform Player;
+
     private Vector3 TargetDestination = Vector3.zero;
-    private GameState CurrentState;
+    public GameState CurrentState;
     public Transform Platform;
     public Transform StartPlatform;
     public Transform CurrentPlatform = null;
@@ -24,11 +25,31 @@ public class GameManager : MonoBehaviour
     public Transform PlatformPreviewPrefab;
     public GameObject gameOverPanel;
 
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
 
     void Start()
     {
+        ScoreManager.Instance.ResetScore();
         CurrentPlatform = StartPlatform;
         StartCoroutine(SpawnPlatform());
+    }
+
+    public void RestartGame()
+    {
+        ScoreManager.Instance.ResetScore();
+        // ... rest of your restart logic ...
     }
 
     void Update()
@@ -45,25 +66,21 @@ public class GameManager : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.A))
             {
-                Debug.Log("A pressed");
                 TargetDestination = Player.position + new Vector3(0, 0, playerMoveDistance);
                 CurrentState = GameState.Moving;
             }
             if (Input.GetKeyDown(KeyCode.S))
             {
-                Debug.Log("S pressed");
                 TargetDestination = Player.position + new Vector3(-playerMoveDistance, 0, 0);
                 CurrentState = GameState.Moving;
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
-                Debug.Log("D pressed");
                 TargetDestination = Player.position + new Vector3(0, 0, -playerMoveDistance);
                 CurrentState = GameState.Moving;
             }
             if (Input.GetKeyDown(KeyCode.W))
             {
-                Debug.Log("W pressed");
                 TargetDestination = Player.position + new Vector3(playerMoveDistance, 0, 0);
                 CurrentState = GameState.Moving;
             }
@@ -103,6 +120,7 @@ public class GameManager : MonoBehaviour
             if (Vector2.Distance(new Vector2(Player.position.x, Player.position.z), new Vector2(TargetDestination.x, TargetDestination.z)) < 0.1f)
             {
                 Player.position = TargetDestination;
+                ScoreManager.Instance.IncrementScore(); // Addin +1 from ScoreManager
                 CurrentState = GameState.ReadyForInput;
             }
         }
@@ -250,11 +268,10 @@ public class GameManager : MonoBehaviour
 
     public void PlayerFell()
     {
-        Debug.Log("Game Over - Player fell");
         CurrentState = GameState.GameOver;
-
         if (gameOverPanel != null)
         {
+            ScoreManager.Instance.DisplayGameOverScores();
             gameOverPanel.SetActive(true);
         }
         // Here you can add more game over logic or UI updates
