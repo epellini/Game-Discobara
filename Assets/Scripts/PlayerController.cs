@@ -1,26 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class PlayerController : MonoBehaviour
 {
-    private GameManager gameManager;
-
-    void Start()
+    void Update()
     {
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        // Check the players Y position and call the PlayerFell method if they fall below -0.5
+        if (transform.position.y < -0.5f)
+        {
+            GameManager.Instance.PlayerFell();
+            GetComponent<Rigidbody>().isKinematic = true;
+        }
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        // Assuming "plane" is the tag assigned to your plane GameObject
-        if (collision.gameObject.CompareTag("plane"))
+        if (collision.gameObject.CompareTag("Platform"))
         {
-            Debug.Log("Player has fallen!");
-            if (gameManager != null)
-            {
-                gameManager.PlayerFell();
-            }
+            ScoreManager.Instance.IncrementScore();
         }
     }
 }
