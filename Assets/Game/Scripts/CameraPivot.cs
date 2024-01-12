@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Camera Pivot
 public class CameraPivot : MonoBehaviour
 {
     public Transform FollowPlayer;
