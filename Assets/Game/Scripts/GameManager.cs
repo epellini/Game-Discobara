@@ -8,12 +8,14 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     public enum GameState
     {
+        Menu,
         ReadyForInput,
         Moving,
         GameOver
     }
 
     [SerializeField] private Transform Player;
+    [SerializeField] private GameObject menuPanel;
     private Vector3 TargetDestination = Vector3.zero;
     public GameState CurrentState;
     public Transform Platform;
@@ -39,6 +41,9 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        // Before the game starts, set the current state to Menu
+        CurrentState = GameState.Menu;
     }
 
 
@@ -48,10 +53,19 @@ public class GameManager : MonoBehaviour
         StartCoroutine(SpawnPlatform());
     }
 
+    public void StartGame()
+    {
+        CurrentState = GameState.ReadyForInput;
+        if (menuPanel != null)
+        {
+            menuPanel.SetActive(false);
+        }
+    }
+
     void Update()
     {
-        // Handle Game Over state
-        if (CurrentState == GameState.GameOver) { return; } // Don't do anything if the game is over
+        if (CurrentState == GameState.Menu || CurrentState == GameState.GameOver)
+            return;
 
         if (CurrentState == GameState.ReadyForInput) // If the game is ready for input, check for input
         {
@@ -241,11 +255,61 @@ public class GameManager : MonoBehaviour
             gameOverPanel.SetActive(true);
         }
         // Here I can add more game over logic or UI updates
-        
+
         // Show the final score
         ScoreManager.Instance.ShowFinalScore();
         ScoreManager.Instance.ShowHighScore();
 
         // Here you can add more game over logic or UI updates
     }
+
+    public void RestartGame()
+    {
+        // Reset game state
+        CurrentState = GameState.ReadyForInput;
+
+        // Reset player position and other relevant variables
+        Player.position = StartPlatform.position; // Adjust as necessary
+        TargetDestination = Vector3.zero;
+
+        // Reset score, platform positions, etc.
+        // For example, if you're keeping track of score in ScoreManager
+        ScoreManager.Instance.ResetScore(); // Ensure ScoreManager has a method to reset the score
+
+        // Hide game over panel and show menu panel if needed
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
+        if (menuPanel != null)
+            menuPanel.SetActive(true); // If you want to show the menu again
+    }
+
+    // Go back to menu
+    public void GoToMenu()
+    {
+        // Reset the player position
+        Player.position = new Vector3(0, 0.5f, 0);
+        //Reset the current platform
+        CurrentPlatform = StartPlatform;
+        // Reset the previous platform
+        previousPlatform = null;
+        // Reset the first platform
+        isFirstPlatform = true;
+        // Reset the game state
+        CurrentState = GameState.Menu;
+        // Reset the game over panel
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
+        // Reset the menu panel
+        if (menuPanel != null)
+        {
+            menuPanel.SetActive(true);
+        }
+        // Reset the score
+        ScoreManager.Instance.ResetScore();
+        // Restart the platform spawning
+        //StartCoroutine(SpawnPlatform());
+    }
+    
 }
