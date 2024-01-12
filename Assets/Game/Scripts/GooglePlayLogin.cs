@@ -15,7 +15,6 @@ public class GooglePlayLogin : MonoBehaviour
     private bool mStandby = false;
     private string mStandbyMessage = string.Empty;
     private string _mStatus = "Ready";
-    [SerializeField] private TextMeshProUGUI leaderboardText;
 
     void Awake()
     {
@@ -27,15 +26,6 @@ public class GooglePlayLogin : MonoBehaviour
         else
         {
             Destroy(gameObject);
-        }
-    }
-
-    public void EnsureAuthentication()
-    {
-        if (!Social.localUser.authenticated)
-        {
-            PlayGamesPlatform.Instance.Authenticate(OnSignInResult);
-
         }
     }
 
@@ -53,11 +43,9 @@ public class GooglePlayLogin : MonoBehaviour
     public void Start()
     {
         Screen.orientation = ScreenOrientation.Portrait;
-
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
         PlayGamesPlatform.Instance.Authenticate(OnSignInResult);
-        EnsureAuthentication();
     }
 
     private void OnSignInResult(SignInStatus signInStatus)
@@ -71,7 +59,6 @@ public class GooglePlayLogin : MonoBehaviour
         {
             Status = "*** Failed to authenticate with " + signInStatus;
         }
-
         //ShowEffect(signInStatus == SignInStatus.Success);
     }
 
@@ -99,7 +86,8 @@ public class GooglePlayLogin : MonoBehaviour
             statusText.text = statusMessage;
     }
 
-    // LEADERBOARD
+    // LEADERBOARD:
+    // Post score to Google Leaderboard
     public void PostScoreToLeaderboard(long score)
     {
         if (Social.localUser.authenticated)
@@ -125,83 +113,47 @@ public class GooglePlayLogin : MonoBehaviour
         }
     }
 
+//     public void LoadLeaderboardScores()
+// {
+//     if (Social.localUser.authenticated)
+//     {
+//         PlayGamesPlatform.Instance.LoadScores(
+//             GPGSIds.leaderboard_Leaders,
+//             LeaderboardStart.TopScores,
+//             10, // Number of scores to load
+//             LeaderboardCollection.Public,
+//             LeaderboardTimeSpan.AllTime,
+//             (data) =>
+//             {
+//                 if (data.Valid)
+//                 {
+//                     Debug.Log("Loaded " + data.Scores.Length + " scores");
+//                     foreach (IScore score in data.Scores)
+//                     {
+//                         // Process each score as needed
+//                         Debug.Log(score.userID + ": " + score.formattedValue);
+//                     }
+//                 }
+//                 else
+//                 {
+//                     Debug.Log("Failed to load scores");
+//                 }
+//             }
+//         );
+//     }
+//     else
+//     {
+//         Debug.Log("Not logged in. Cannot load scores.");
+//     }
+// }
+
+
     // Load Google Leaderboard UI
     public void ShowLeaderboard()
     {
-        EnsureAuthentication();
         if (Social.localUser.authenticated)
         {
             Social.ShowLeaderboardUI();
         }
     }
-
-    // Load INGAME Leaderboard UI
-    public void LoadLeaderboardScores()
-    {EnsureAuthentication();
-        if (Social.localUser.authenticated)
-        {
-            PlayGamesPlatform.Instance.LoadScores(
-                GPGSIds.leaderboard_Leaders,
-                LeaderboardStart.TopScores,
-                10, // Number of scores to load
-                LeaderboardCollection.Public,
-                LeaderboardTimeSpan.AllTime,
-                (data) =>
-                {
-                    if (data.Valid)
-                    {
-                        // Prepare to fetch user details
-                        List<string> userIds = new List<string>();
-                        foreach (IScore score in data.Scores)
-                        {
-                            userIds.Add(score.userID);
-                        }
-
-                        // Fetch user details
-                        Social.LoadUsers(userIds.ToArray(), (users) =>
-                        {
-
-                            string leaderboardOutput = "Leaderboard Scores:\n";
-                            foreach (IScore score in data.Scores)
-                            {
-                                IUserProfile user = FindUser(users, score.userID);
-                                string userName = (user != null) ? user.userName : "Anonymous";
-                                leaderboardOutput += $"{score.rank}. {userName}: {score.formattedValue}\n";
-                            }
-                            UpdateLeaderboardText(leaderboardOutput);
-                        });
-                    }
-                    else
-                    {
-                        UpdateLeaderboardText("Failed to load scores");
-                    }
-                }
-            );
-        }
-        else
-        {
-            UpdateLeaderboardText("Not logged in. Cannot load scores.");
-        }
-    }
-
-    // Helper method to find a user profile by ID
-    private IUserProfile FindUser(IUserProfile[] users, string userId)
-    {
-        foreach (IUserProfile user in users)
-        {
-            if (user.id == userId)
-            {
-                return user;
-            }
-        }
-        return null;
-    }
-
-    private void UpdateLeaderboardText(string message)
-    {
-        if (leaderboardText != null)
-            leaderboardText.text = message;
-    }
-
-
 }
