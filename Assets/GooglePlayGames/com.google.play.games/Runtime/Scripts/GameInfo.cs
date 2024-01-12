@@ -36,10 +36,10 @@ namespace GooglePlayGames {
         private const string UnescapedWebClientId = "WEB_CLIENTID";
         private const string UnescapedNearbyServiceId = "NEARBY_SERVICE_ID";
 
-        public const string ApplicationId = "966718320491"; // Filled in automatically
+        public const string ApplicationId = "977095632078"; // Filled in automatically
         public const string IosClientId = "__IOS_CLIENTID__"; // Filled in automatically
-        public const string WebClientId = "966718320491-mr98e239unn856nsp7kstmena139nca3.apps.googleusercontent.com"; // Filled in automatically
-        public const string NearbyConnectionServiceId = "";
+        public const string WebClientId = "977095632078-2c3nf99ldlqeragkkf7qp8se0d3sof6s.apps.googleusercontent.com"; // Filled in automatically
+        public const string NearbyConnectionServiceId = "com.LittleBeanStudio.PlatformJumpGame";
 
         public static bool ApplicationIdInitialized() {
             return !string.IsNullOrEmpty(ApplicationId) && !ApplicationId.Equals(ToEscapedToken(UnescapedApplicationId));
