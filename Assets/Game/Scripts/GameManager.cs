@@ -33,6 +33,10 @@ public class GameManager : MonoBehaviour
     private Vector2 touchEnd;
     private bool isSwiping = false;
 
+    private float normalSpawnDelay = 1f; // Normal delay between platform spawns
+    private float slowMotionSpawnDelay = 2f; // Delay during slow motion
+    private bool isSlowMotionActive = false;
+
 
     void Awake()
     {
@@ -134,6 +138,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    [SerializeField] private float movementSpeed = 10f; // Adjust this speed in the Unity Inspector
+    private Vector3 velocity = Vector3.zero; // For SmoothDamp
+
     private void HandleSwipe()
     {
         Vector2 swipeDirection = touchEnd - touchStart;
@@ -171,16 +178,30 @@ public class GameManager : MonoBehaviour
     private void FixedUpdate()
     {
         if (CurrentState != GameState.Moving) return;
-        if (CurrentState == GameState.Moving)
+
+        // Smoothly move the player towards the target destination
+        Player.position = Vector3.SmoothDamp(Player.position, new Vector3(TargetDestination.x, Player.position.y, TargetDestination.z), ref velocity, movementSpeed * Time.fixedDeltaTime);
+
+        // Check if the player has reached close to the target destination
+        if (Vector3.Distance(Player.position, TargetDestination) < 0.1f)
         {
-            Player.position = Vector3.MoveTowards(Player.position, new Vector3(TargetDestination.x, Player.position.y, TargetDestination.z), 0.2f);
-            if (Vector2.Distance(new Vector2(Player.position.x, Player.position.z), new Vector2(TargetDestination.x, TargetDestination.z)) < 0.1f)
-            {
-                Player.position = TargetDestination;
-                CurrentState = GameState.ReadyForInput;
-            }
+            Player.position = TargetDestination;
+            CurrentState = GameState.ReadyForInput;
         }
     }
+
+    public void ActivateSlowMotion()
+    {
+        isSlowMotionActive = true;
+        StartCoroutine(SlowMotionDuration());
+    }
+
+    private IEnumerator SlowMotionDuration()
+    {
+        yield return new WaitForSeconds(5f); // Duration of the slow motion
+        isSlowMotionActive = false;
+    }
+
 
     private void CreatePlatform(Transform _Platform, int _InValue)
     {
@@ -203,6 +224,17 @@ public class GameManager : MonoBehaviour
             CurrentPlatform = Instantiate(Platform, new Vector3(_Platform.position.x - 1, platformHeight, _Platform.position.z), Quaternion.identity);
         }
 
+        // Decide whether to spawn a power-up
+        if (Random.value < powerUpSpawnChance)
+        {
+            // Calculate power-up position
+            Vector3 powerUpPosition = CurrentPlatform.position;
+            float powerUpVerticalOffset = 0.5f; // Manually set the vertical offset
+            powerUpPosition.y += powerUpVerticalOffset; // Position it above the platform
+
+            Instantiate(powerUpPrefab, powerUpPosition, Quaternion.identity, CurrentPlatform);
+        }
+
         // If the previous platform is the start platform and this is the first spawn,
         // don't destroy it immediately. Otherwise, schedule the destruction.
         if (!isFirstPlatform && previousPlatform != null)
@@ -222,15 +254,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+    [SerializeField] private GameObject powerUpPrefab; // Assign this in the inspector
+    private float powerUpSpawnChance = 0.03f; //  3% chance of spawning a power-up
+
     private IEnumerator SpawnPlatform()
     {
         while (CurrentState != GameState.GameOver)
         {
-            yield return new WaitForSeconds(1f); // Time before showing the preview
+            float delay = isSlowMotionActive ? slowMotionSpawnDelay : normalSpawnDelay;
+            yield return new WaitForSeconds(delay); // Time before showing the preview
             int newValue = Random.Range(0, 4);
 
             // Calculate the position for the preview
             Vector3 previewPosition = CalculateNextPlatformPosition(CurrentPlatform, newValue);
+
+            // Instantiate the preview platform
             Transform preview = Instantiate(PlatformPreviewPrefab, previewPosition, Quaternion.identity);
 
             yield return new WaitForSeconds(0.3f); // Time for the player to see the preview
@@ -240,6 +279,7 @@ public class GameManager : MonoBehaviour
             CreatePlatform(CurrentPlatform, newValue);
         }
     }
+
 
     private Vector3 CalculateNextPlatformPosition(Transform currentPlatform, int direction)
     {

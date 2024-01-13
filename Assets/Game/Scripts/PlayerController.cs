@@ -6,6 +6,7 @@ using UnityEngine.SocialPlatforms.Impl;
 public class PlayerController : MonoBehaviour
 {
     private bool hasFallen = false;
+    public SlowMotionCountdown slowMotionCountdown; // Assign this in the inspector
     void Update()
     {
          if (!hasFallen && transform.position.y < -0.5f)
@@ -29,4 +30,15 @@ public class PlayerController : MonoBehaviour
         hasFallen = false;
         GetComponent<Rigidbody>().isKinematic = false;
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("PowerUp"))
+        {
+            GameManager.Instance.ActivateSlowMotion();
+            slowMotionCountdown.StartCountdown();
+            Destroy(other.gameObject); // Remove the power-up after pickup
+        }
+    }
+
 }
