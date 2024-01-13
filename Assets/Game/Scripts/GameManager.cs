@@ -16,6 +16,9 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private Transform Player;
     [SerializeField] private GameObject menuPanel;
+    [SerializeField] private GameObject gamePanel;
+    [SerializeField] private GameObject gameOverPanel;
+    //public GameObject gameOverPanel;
     private Vector3 TargetDestination = Vector3.zero;
     public GameState CurrentState;
     public Transform Platform;
@@ -25,10 +28,10 @@ public class GameManager : MonoBehaviour
     private float playerMoveDistance = 1f;
     private bool isFirstPlatform = true;
     public Transform PlatformPreviewPrefab;
-    public GameObject gameOverPanel;
     private Vector2 touchStart;
     private Vector2 touchEnd;
     private bool isSwiping = false;
+
 
     void Awake()
     {
@@ -41,31 +44,52 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-
         // Before the game starts, set the current state to Menu
         CurrentState = GameState.Menu;
     }
 
-
     void Start()
     {
-        CurrentPlatform = StartPlatform;
-        StartCoroutine(SpawnPlatform());
+        gameOverPanel.SetActive(false);
+        gamePanel.SetActive(false);
     }
 
+    private bool gameStartedPreviously = false;
     public void StartGame()
     {
-        CurrentState = GameState.ReadyForInput;
-        if (menuPanel != null)
+        if (!gameStartedPreviously)
         {
+            // First time starting the game
+            Debug.Log("Game started - FIRST time");
             menuPanel.SetActive(false);
+            gamePanel.SetActive(true);
+            gameOverPanel.SetActive(false);
+            CurrentState = GameState.ReadyForInput;
+            CurrentPlatform = StartPlatform;
+            StartCoroutine(SpawnPlatform());
+            gameStartedPreviously = true;
+        }
+        else
+        {
+            // Subsequent times starting the game
+            ResetGame();
+            menuPanel.SetActive(false);
+            Debug.Log("Game started - SECOND time");
         }
     }
 
     void Update()
     {
-        if (CurrentState == GameState.Menu || CurrentState == GameState.GameOver)
+        if (CurrentState == GameState.Menu)
+        {
+            gameOverPanel.SetActive(false);
             return;
+        }
+
+        if (CurrentState == GameState.GameOver)
+        {
+            return;
+        }
 
         if (CurrentState == GameState.ReadyForInput) // If the game is ready for input, check for input
         {
@@ -250,51 +274,20 @@ public class GameManager : MonoBehaviour
     public void PlayerFell()
     {
         CurrentState = GameState.GameOver;
+        gamePanel.SetActive(false);
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
         }
         // Here I can add more game over logic or UI updates
-
         // Show the final score
         ScoreManager.Instance.ShowFinalScore();
         ScoreManager.Instance.ShowHighScore();
-
-        // Here you can add more game over logic or UI updates
-    }
-
-    public void RestartGame()
-    {
-        // Reset game state
-        CurrentState = GameState.ReadyForInput;
-
-        // Reset player position and other relevant variables
-        Player.position = StartPlatform.position; // Adjust as necessary
-        TargetDestination = Vector3.zero;
-
-        // Reset score, platform positions, etc.
-        // For example, if you're keeping track of score in ScoreManager
-        ScoreManager.Instance.ResetScore(); // Ensure ScoreManager has a method to reset the score
-
-        // Hide game over panel and show menu panel if needed
-        if (gameOverPanel != null)
-            gameOverPanel.SetActive(false);
-        if (menuPanel != null)
-            menuPanel.SetActive(true); // If you want to show the menu again
     }
 
     // Go back to menu
     public void GoToMenu()
     {
-        // Reset the player position
-        Player.position = new Vector3(0, 0.5f, 0);
-        //Reset the current platform
-        CurrentPlatform = StartPlatform;
-        // Reset the previous platform
-        previousPlatform = null;
-        // Reset the first platform
-        isFirstPlatform = true;
-        // Reset the game state
         CurrentState = GameState.Menu;
         // Reset the game over panel
         if (gameOverPanel != null)
@@ -306,10 +299,69 @@ public class GameManager : MonoBehaviour
         {
             menuPanel.SetActive(true);
         }
-        // Reset the score
-        ScoreManager.Instance.ResetScore();
-        // Restart the platform spawning
-        //StartCoroutine(SpawnPlatform());
     }
-    
+
+    public void ResetGame()
+    {
+        StartCoroutine(ResetGameCoroutine());
+    }
+
+    private IEnumerator ResetGameCoroutine()
+    {
+        // Wait for 1 second before proceeding
+        yield return new WaitForSeconds(1f);
+
+        // Ensure the StartPlatform is active
+        if (StartPlatform != null)
+        {
+            StartPlatform.gameObject.SetActive(true);
+            StartPlatform.position = new Vector3(0, 0, 0);
+            //Player.position = StartPlatform.position; // Reset player position to the start position
+        }
+        else
+        {
+            Debug.LogError("StartPlatform is not assigned in the GameManager.");
+        }
+        // 1. Reset GameState
+        CurrentState = GameState.ReadyForInput;
+
+        // 2. Reset Player Position and Movement
+        Player.GetComponent<PlayerController>().ResetPlayer();
+        Player.position = new Vector3(0, 0.35f, 0);
+        TargetDestination = Vector3.zero;
+
+        // 3. Platform Handling
+        if (CurrentPlatform != null && CurrentPlatform != StartPlatform)
+        {
+            Destroy(CurrentPlatform.gameObject);
+        }
+        if (previousPlatform != null && previousPlatform != StartPlatform)
+        {
+            Destroy(previousPlatform.gameObject);
+        }
+
+        //CurrentPlatform = Instantiate(StartPlatform, new Vector3(0, 0, 0), Quaternion.identity);
+        CurrentPlatform = StartPlatform;
+        previousPlatform = null;
+        isFirstPlatform = true;
+
+        // 4. UI Elements
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
+        gamePanel.SetActive(true);
+
+        // 5. Reset Touch Input and Swipe Handling
+        touchStart = Vector2.zero;
+        touchEnd = Vector2.zero;
+        isSwiping = false;
+
+        // 6. Score and High Score Reset (if applicable)
+        ScoreManager.Instance.ResetScore();
+        // ScoreManager.Instance.ResetHighScore(); // If you have a high score system
+
+        StopCoroutine(SpawnPlatform());
+        StartCoroutine(SpawnPlatform());
+    }
 }

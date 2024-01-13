@@ -5,13 +5,14 @@ using UnityEngine.SocialPlatforms.Impl;
 
 public class PlayerController : MonoBehaviour
 {
+    private bool hasFallen = false;
     void Update()
     {
-        // Check the players Y position and call the PlayerFell method if they fall below -0.5
-        if (transform.position.y < -0.5f)
+         if (!hasFallen && transform.position.y < -0.5f)
         {
             GameManager.Instance.PlayerFell();
             GetComponent<Rigidbody>().isKinematic = true;
+            hasFallen = true; // Set the flag to true to prevent further calls
         }
     }
 
@@ -21,5 +22,11 @@ public class PlayerController : MonoBehaviour
         {
             ScoreManager.Instance.IncrementScore();
         }
+    }
+
+    public void ResetPlayer()
+    {
+        hasFallen = false;
+        GetComponent<Rigidbody>().isKinematic = false;
     }
 }
