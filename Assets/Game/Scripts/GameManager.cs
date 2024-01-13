@@ -18,7 +18,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject menuPanel;
     [SerializeField] private GameObject gamePanel;
     [SerializeField] private GameObject gameOverPanel;
-    //public GameObject gameOverPanel;
+    [SerializeField] private GameObject crossfadePanel;
+    [SerializeField] private TransitionController transitionController;
     private Vector3 TargetDestination = Vector3.zero;
     public GameState CurrentState;
     public Transform Platform;
@@ -303,13 +304,15 @@ public class GameManager : MonoBehaviour
 
     public void ResetGame()
     {
+        transitionController.StartFadeOut();
         StartCoroutine(ResetGameCoroutine());
     }
 
     private IEnumerator ResetGameCoroutine()
     {
         // Wait for 1 second before proceeding
-        yield return new WaitForSeconds(1f);
+        //transitionController.StartFadeOut();
+        yield return new WaitForSeconds(0.8f);
 
         // Ensure the StartPlatform is active
         if (StartPlatform != null)
@@ -363,5 +366,7 @@ public class GameManager : MonoBehaviour
 
         StopCoroutine(SpawnPlatform());
         StartCoroutine(SpawnPlatform());
+
     }
+
 }
