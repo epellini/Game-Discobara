@@ -71,6 +71,10 @@ public class GameManager : MonoBehaviour
             gameOverPanel.SetActive(false);
             CurrentState = GameState.ReadyForInput;
             CurrentPlatform = StartPlatform;
+
+            // Schedule the removal of StartPlatform after a few seconds
+            StartCoroutine(DeactivateAfterDelay(StartPlatform.gameObject, 2f)); // Set the delay as needed
+
             StartCoroutine(SpawnPlatform());
             gameStartedPreviously = true;
         }
@@ -82,6 +86,10 @@ public class GameManager : MonoBehaviour
             Debug.Log("Game started - SECOND time");
         }
     }
+
+
+    [SerializeField] private float rotationSpeed = 100f;
+    private Vector3 targetDirection;
 
     void Update()
     {
@@ -98,23 +106,37 @@ public class GameManager : MonoBehaviour
 
         if (CurrentState == GameState.ReadyForInput) // If the game is ready for input, check for input
         {
+            playerAnimator.SetTrigger("Idle");
             if (Input.GetKeyDown(KeyCode.A))
             {
+                //targetDirection = Vector3.left;
+                playerAnimator.SetTrigger("Moved");
+                targetDirection = Vector3.forward;
+
                 TargetDestination = Player.position + new Vector3(0, 0, playerMoveDistance);
                 CurrentState = GameState.Moving;
             }
             if (Input.GetKeyDown(KeyCode.S))
             {
+                playerAnimator.SetTrigger("Moved");
+                targetDirection = Vector3.left;
+                //targetDirection = Vector3.down;
                 TargetDestination = Player.position + new Vector3(-playerMoveDistance, 0, 0);
                 CurrentState = GameState.Moving;
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
+                playerAnimator.SetTrigger("Moved");
+                //targetDirection = Vector3.right;
+                targetDirection = Vector3.back;
                 TargetDestination = Player.position + new Vector3(0, 0, -playerMoveDistance);
                 CurrentState = GameState.Moving;
             }
             if (Input.GetKeyDown(KeyCode.W))
             {
+                playerAnimator.SetTrigger("Moved");
+                targetDirection = Vector3.right;
+                //targetDirection = Vector3.up;
                 TargetDestination = Player.position + new Vector3(playerMoveDistance, 0, 0);
                 CurrentState = GameState.Moving;
             }
@@ -150,11 +172,15 @@ public class GameManager : MonoBehaviour
             if (swipeDirection.x > 0)
             {
                 // Right swipe
+                playerAnimator.SetTrigger("Moved");
+                targetDirection = Vector3.back;
                 TargetDestination = Player.position + new Vector3(0, 0, -playerMoveDistance);
             }
             else
             {
                 // Left swipe
+                playerAnimator.SetTrigger("Moved");
+                targetDirection = Vector3.forward;
                 TargetDestination = Player.position + new Vector3(0, 0, playerMoveDistance);
             }
         }
@@ -164,11 +190,15 @@ public class GameManager : MonoBehaviour
             if (swipeDirection.y > 0)
             {
                 // Up swipe
+                playerAnimator.SetTrigger("Moved");
+                targetDirection = Vector3.right;
                 TargetDestination = Player.position + new Vector3(playerMoveDistance, 0, 0);
             }
             else
             {
                 // Down swipe
+                playerAnimator.SetTrigger("Moved");
+                targetDirection = Vector3.left;
                 TargetDestination = Player.position + new Vector3(-playerMoveDistance, 0, 0);
             }
         }
@@ -178,6 +208,18 @@ public class GameManager : MonoBehaviour
     private void FixedUpdate()
     {
         if (CurrentState != GameState.Moving) return;
+
+        Vector3 currentDirection = Player.forward;
+        currentDirection.y = 0; // Keep the Y component constant to avoid tilting
+
+        Vector3 newDirection = Vector3.RotateTowards(currentDirection, targetDirection, rotationSpeed * Time.fixedDeltaTime, 0f);
+        newDirection.y = 0; // Ensure the new direction is also on the XZ plane
+
+        // Convert the direction vector to a quaternion
+        Quaternion newRotation = Quaternion.LookRotation(newDirection);
+
+        // Apply the new rotation
+        Player.rotation = newRotation;
 
         // Smoothly move the player towards the target destination
         Player.position = Vector3.SmoothDamp(Player.position, new Vector3(TargetDestination.x, Player.position.y, TargetDestination.z), ref velocity, movementSpeed * Time.fixedDeltaTime);
@@ -203,81 +245,76 @@ public class GameManager : MonoBehaviour
     }
 
 
-    private void CreatePlatform(Transform _Platform, int _InValue)
+    private void CreatePlatform(Vector3 position)
     {
         float platformHeight = StartPlatform.position.y;
+        position.y = platformHeight; // Ensure the height is consistent
 
-        if (_InValue == 0)
-        {
-            CurrentPlatform = Instantiate(Platform, new Vector3(_Platform.position.x, platformHeight, _Platform.position.z + 1), Quaternion.identity);
-        }
-        else if (_InValue == 1)
-        {
-            CurrentPlatform = Instantiate(Platform, new Vector3(_Platform.position.x, platformHeight, _Platform.position.z - 1), Quaternion.identity);
-        }
-        else if (_InValue == 2)
-        {
-            CurrentPlatform = Instantiate(Platform, new Vector3(_Platform.position.x + 1, platformHeight, _Platform.position.z), Quaternion.identity);
-        }
-        else
-        {
-            CurrentPlatform = Instantiate(Platform, new Vector3(_Platform.position.x - 1, platformHeight, _Platform.position.z), Quaternion.identity);
-        }
+        CurrentPlatform = Instantiate(Platform, position, Quaternion.identity);
 
         // Decide whether to spawn a power-up
         if (Random.value < powerUpSpawnChance)
         {
-            // Calculate power-up position
             Vector3 powerUpPosition = CurrentPlatform.position;
             float powerUpVerticalOffset = 0.5f; // Manually set the vertical offset
             powerUpPosition.y += powerUpVerticalOffset; // Position it above the platform
-
             Instantiate(powerUpPrefab, powerUpPosition, Quaternion.identity, CurrentPlatform);
         }
 
-        // If the previous platform is the start platform and this is the first spawn,
-        // don't destroy it immediately. Otherwise, schedule the destruction.
+        // Handle the previous platform
         if (!isFirstPlatform && previousPlatform != null)
         {
-            Destroy(previousPlatform.gameObject, 0.5f); // Delay destruction
+            Destroy(previousPlatform.gameObject, 0.4f); // Delay destruction
         }
         previousPlatform = CurrentPlatform;
-
-        // After the first platform is created, set isFirstPlatform to false and schedule destruction of the start platform
-        if (isFirstPlatform)
-        {
-            isFirstPlatform = false;
-            if (StartPlatform != null)
-            {
-                StartCoroutine(DeactivateAfterDelay(StartPlatform.gameObject, 0.5f));
-            }
-        }
+        isFirstPlatform = false;
     }
 
 
     [SerializeField] private GameObject powerUpPrefab; // Assign this in the inspector
-    private float powerUpSpawnChance = 0.03f; //  3% chance of spawning a power-up
+    private float powerUpSpawnChance = 0.01f; //  3% chance of spawning a power-up
 
     private IEnumerator SpawnPlatform()
     {
         while (CurrentState != GameState.GameOver)
         {
-            float delay = isSlowMotionActive ? slowMotionSpawnDelay : normalSpawnDelay;
-            yield return new WaitForSeconds(delay); // Time before showing the preview
-            int newValue = Random.Range(0, 4);
+            yield return new WaitForSeconds(isSlowMotionActive ? slowMotionSpawnDelay : normalSpawnDelay);
 
-            // Calculate the position for the preview
-            Vector3 previewPosition = CalculateNextPlatformPosition(CurrentPlatform, newValue);
+            bool validPositionFound = false;
+            Vector3 previewPosition = Vector3.zero;
+            int attempts = 0;
+            const int maxAttempts = 10;
 
-            // Instantiate the preview platform
+            while (!validPositionFound && attempts < maxAttempts)
+            {
+                int direction = Random.Range(0, 4);
+                previewPosition = CalculateNextPlatformPosition(CurrentPlatform, direction);
+
+                if (IsPositionWithinBoundary(previewPosition))
+                {
+                    validPositionFound = true;
+                }
+                attempts++;
+            }
+
+            if (!validPositionFound)
+            {
+                Debug.LogError("Failed to find a valid platform position within the boundary after multiple attempts.");
+                yield break;
+            }
+
             Transform preview = Instantiate(PlatformPreviewPrefab, previewPosition, Quaternion.identity);
-
-            yield return new WaitForSeconds(0.3f); // Time for the player to see the preview
-
-            // Replace the preview with the actual platform
+            yield return new WaitForSeconds(0.3f);
             Destroy(preview.gameObject);
-            CreatePlatform(CurrentPlatform, newValue);
+            CreatePlatform(previewPosition);
         }
+    }
+
+    private bool IsPositionWithinBoundary(Vector3 position)
+    {
+        const float boundary = 2f; // Half the size of the 5x5 area
+        return position.x >= -boundary && position.x <= boundary &&
+               position.z >= -boundary && position.z <= boundary;
     }
 
 
@@ -312,18 +349,46 @@ public class GameManager : MonoBehaviour
         obj.SetActive(false);
     }
 
-    public void PlayerFell()
+    [SerializeField] private ParticleSystem playerFellParticles;
+    //private bool hasFallen = false;
+
+    public Animator playerAnimator;
+
+    public IEnumerator PlayerDeathCoroutine()
     {
+        // Play animation
+        playerAnimator.SetTrigger("Death");
+
+        yield return new WaitForSeconds(1f);
+
+        // hasFallen = true;
+        // // Play the particle effect
+        // if (hasFallen)
+        // {
+        //     playerFellParticles.Play();
+        //     //Invoke("StopPlayerFellParticles", 1f); // Stop after 1 second
+        // }
+
+        // Wait for 1 second before proceeding
+        //Invoke("GameOver", 1f);
+       
+
         CurrentState = GameState.GameOver;
         gamePanel.SetActive(false);
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
         }
-        // Here I can add more game over logic or UI updates
+
         // Show the final score
         ScoreManager.Instance.ShowFinalScore();
         ScoreManager.Instance.ShowHighScore();
+    }
+
+    public void PlayerFell()
+    {
+        
+        StartCoroutine(PlayerDeathCoroutine());
     }
 
     // Go back to menu
@@ -345,6 +410,7 @@ public class GameManager : MonoBehaviour
     public void ResetGame()
     {
         transitionController.StartFadeOut();
+         playerAnimator.SetTrigger("Reset");
         StartCoroutine(ResetGameCoroutine());
     }
 
@@ -370,7 +436,7 @@ public class GameManager : MonoBehaviour
 
         // 2. Reset Player Position and Movement
         Player.GetComponent<PlayerController>().ResetPlayer();
-        Player.position = new Vector3(0, 0.35f, 0);
+        Player.position = new Vector3(0, 0, 0);
         TargetDestination = Vector3.zero;
 
         // 3. Platform Handling
@@ -403,7 +469,7 @@ public class GameManager : MonoBehaviour
         // 6. Score and High Score Reset (if applicable)
         ScoreManager.Instance.ResetScore();
         // ScoreManager.Instance.ResetHighScore(); // If you have a high score system
-
+        StartCoroutine(DeactivateAfterDelay(StartPlatform.gameObject, 2f)); // Set the delay as needed
         StopCoroutine(SpawnPlatform());
         StartCoroutine(SpawnPlatform());
 

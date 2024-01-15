@@ -9,19 +9,26 @@ public class PlayerController : MonoBehaviour
     public SlowMotionCountdown slowMotionCountdown; // Assign this in the inspector
     void Update()
     {
-         if (!hasFallen && transform.position.y < -0.5f)
+         if (hasFallen) 
         {
             GameManager.Instance.PlayerFell();
-            GetComponent<Rigidbody>().isKinematic = true;
-            hasFallen = true; // Set the flag to true to prevent further calls
+            
+           //GetComponent<Rigidbody>().isKinematic = true;
+            hasFallen = false; // Set the flag to true to prevent further calls
         }
     }
+
 
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Platform"))
         {
             ScoreManager.Instance.IncrementScore();
+        }
+
+        if (collision.gameObject.CompareTag("Wrong"))
+        {
+            hasFallen = true;
         }
     }
 
