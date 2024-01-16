@@ -37,6 +37,10 @@ public class GameManager : MonoBehaviour
     private float slowMotionSpawnDelay = 2f; // Delay during slow motion
     private bool isSlowMotionActive = false;
 
+    private const float boundary = 2.5f; // Half the size of the 5x5 area
+    private const float boundaryOffset = 0.1f; // Offset to prevent player from getting too close to the boundary
+
+
 
     void Awake()
     {
@@ -90,6 +94,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private float rotationSpeed = 100f;
     private Vector3 targetDirection;
+    [SerializeField] private string[] movedAnimations;
 
     void Update()
     {
@@ -109,16 +114,18 @@ public class GameManager : MonoBehaviour
             playerAnimator.SetTrigger("Idle");
             if (Input.GetKeyDown(KeyCode.A))
             {
-                //targetDirection = Vector3.left;
-                playerAnimator.SetTrigger("Moved");
+                int randomIndex = Random.Range(0, movedAnimations.Length);
+                string selectedTrigger = movedAnimations[randomIndex];
+                playerAnimator.SetTrigger(selectedTrigger);
                 targetDirection = Vector3.forward;
-
                 TargetDestination = Player.position + new Vector3(0, 0, playerMoveDistance);
                 CurrentState = GameState.Moving;
             }
             if (Input.GetKeyDown(KeyCode.S))
             {
-                playerAnimator.SetTrigger("Moved");
+                int randomIndex = Random.Range(0, movedAnimations.Length);
+                string selectedTrigger = movedAnimations[randomIndex];
+                playerAnimator.SetTrigger(selectedTrigger);
                 targetDirection = Vector3.left;
                 //targetDirection = Vector3.down;
                 TargetDestination = Player.position + new Vector3(-playerMoveDistance, 0, 0);
@@ -126,7 +133,9 @@ public class GameManager : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.D))
             {
-                playerAnimator.SetTrigger("Moved");
+                int randomIndex = Random.Range(0, movedAnimations.Length);
+                string selectedTrigger = movedAnimations[randomIndex];
+                playerAnimator.SetTrigger(selectedTrigger);
                 //targetDirection = Vector3.right;
                 targetDirection = Vector3.back;
                 TargetDestination = Player.position + new Vector3(0, 0, -playerMoveDistance);
@@ -134,7 +143,9 @@ public class GameManager : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.W))
             {
-                playerAnimator.SetTrigger("Moved");
+                int randomIndex = Random.Range(0, movedAnimations.Length);
+                string selectedTrigger = movedAnimations[randomIndex];
+                playerAnimator.SetTrigger(selectedTrigger);
                 targetDirection = Vector3.right;
                 //targetDirection = Vector3.up;
                 TargetDestination = Player.position + new Vector3(playerMoveDistance, 0, 0);
@@ -221,16 +232,29 @@ public class GameManager : MonoBehaviour
         // Apply the new rotation
         Player.rotation = newRotation;
 
-        // Smoothly move the player towards the target destination
-        Player.position = Vector3.SmoothDamp(Player.position, new Vector3(TargetDestination.x, Player.position.y, TargetDestination.z), ref velocity, movementSpeed * Time.fixedDeltaTime);
+        // Calculate the next position before moving
+        Vector3 nextPosition = Vector3.SmoothDamp(Player.position, new Vector3(TargetDestination.x, Player.position.y, TargetDestination.z), ref velocity, movementSpeed * Time.fixedDeltaTime);
 
-        // Check if the player has reached close to the target destination
-        if (Vector3.Distance(Player.position, TargetDestination) < 0.1f)
+        // Check if the next position is within the boundary
+        if (IsPositionWithinBoundary(nextPosition))
         {
-            Player.position = TargetDestination;
-            CurrentState = GameState.ReadyForInput;
+            // Smoothly move the player towards the target destination
+            Player.position = nextPosition;
+
+            // Check if the player has reached close to the target destination
+            if (Vector3.Distance(Player.position, TargetDestination) < 0.1f)
+            {
+                Player.position = TargetDestination;
+                CurrentState = GameState.ReadyForInput;
+            }
+        }
+        else
+        {
+            // Player is trying to move out of the boundary, so prevent it
+            // You can add some feedback or handle this situation as needed
         }
     }
+
 
     public void ActivateSlowMotion()
     {
@@ -312,10 +336,10 @@ public class GameManager : MonoBehaviour
 
     private bool IsPositionWithinBoundary(Vector3 position)
     {
-        const float boundary = 2f; // Half the size of the 5x5 area
-        return position.x >= -boundary && position.x <= boundary &&
-               position.z >= -boundary && position.z <= boundary;
+        return position.x >= -boundary + boundaryOffset && position.x <= boundary - boundaryOffset &&
+               position.z >= -boundary + boundaryOffset && position.z <= boundary - boundaryOffset;
     }
+
 
 
     private Vector3 CalculateNextPlatformPosition(Transform currentPlatform, int direction)
@@ -354,24 +378,16 @@ public class GameManager : MonoBehaviour
 
     public Animator playerAnimator;
 
+    public void PlayerFell()
+    {
+        StartCoroutine(PlayerDeathCoroutine());
+    }
     public IEnumerator PlayerDeathCoroutine()
     {
         // Play animation
         playerAnimator.SetTrigger("Death");
 
-        yield return new WaitForSeconds(1f);
-
-        // hasFallen = true;
-        // // Play the particle effect
-        // if (hasFallen)
-        // {
-        //     playerFellParticles.Play();
-        //     //Invoke("StopPlayerFellParticles", 1f); // Stop after 1 second
-        // }
-
-        // Wait for 1 second before proceeding
-        //Invoke("GameOver", 1f);
-       
+        yield return new WaitForSeconds(0.5f);
 
         CurrentState = GameState.GameOver;
         gamePanel.SetActive(false);
@@ -383,12 +399,6 @@ public class GameManager : MonoBehaviour
         // Show the final score
         ScoreManager.Instance.ShowFinalScore();
         ScoreManager.Instance.ShowHighScore();
-    }
-
-    public void PlayerFell()
-    {
-        
-        StartCoroutine(PlayerDeathCoroutine());
     }
 
     // Go back to menu
@@ -410,15 +420,15 @@ public class GameManager : MonoBehaviour
     public void ResetGame()
     {
         transitionController.StartFadeOut();
-         playerAnimator.SetTrigger("Reset");
+
         StartCoroutine(ResetGameCoroutine());
     }
 
     private IEnumerator ResetGameCoroutine()
     {
-        // Wait for 1 second before proceeding
-        //transitionController.StartFadeOut();
-        yield return new WaitForSeconds(0.8f);
+        playerAnimator.SetTrigger("Reset");
+
+        yield return new WaitForSeconds(1f);
 
         // Ensure the StartPlatform is active
         if (StartPlatform != null)

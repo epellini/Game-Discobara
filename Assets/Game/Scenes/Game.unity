@@ -1850,6 +1850,10 @@ MonoBehaviour:
   CurrentPlatform: {fileID: 4266329005899544926, guid: 3c1d4096d2e74a149b231a93f8ba3fbf, type: 3}
   PlatformPreviewPrefab: {fileID: 4266329005899544926, guid: 6e89b5e3b4802df4f9720ec0ccc204c0, type: 3}
   rotationSpeed: 100
+  movedAnimations:
+  - Moved
+  - Moved2
+  - Moved3
   movementSpeed: 1
   powerUpPrefab: {fileID: 8247843832711000007, guid: fa86d9a0cc7f17340af303da2fb64f60, type: 3}
   playerFellParticles: {fileID: 0}
