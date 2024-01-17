@@ -4,25 +4,22 @@ using UnityEngine;
 public class TransitionController : MonoBehaviour
 {
     private Animator animator;
-    private static readonly int StartTrigger = Animator.StringToHash("Start");
-
     void Awake()
     {
         animator = GetComponent<Animator>();
         gameObject.SetActive(false); 
     }
 
-    public void StartFadeOut()
+    public void PlayTransition()
     {
         gameObject.SetActive(true);
-        animator.SetTrigger(StartTrigger);
+        animator.SetTrigger("Transition");
         StartCoroutine(DeactivateAfterAnimation());
     }
 
     private IEnumerator DeactivateAfterAnimation()
     {
-        // Wait for the animation duration (1 second)
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
         gameObject.SetActive(false);
     }
 }

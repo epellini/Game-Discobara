@@ -1892,12 +1892,13 @@ MonoBehaviour:
   StartPlatform: {fileID: 2115905219}
   CurrentPlatform: {fileID: 4266329005899544926, guid: 3c1d4096d2e74a149b231a93f8ba3fbf, type: 3}
   PlatformPreviewPrefab: {fileID: 4266329005899544926, guid: 6e89b5e3b4802df4f9720ec0ccc204c0, type: 3}
-  rotationSpeed: 25
+  rotationSpeed: 100
   movedAnimations:
   - Moved1
   - Moved2
   - Moved3
-  movementSpeed: 2.5
+  - Moved1
+  - Moved1
   playerFellParticles: {fileID: 0}
   playerAnimator: {fileID: 1817947868}
 --- !u!4 &770550488
@@ -3187,7 +3188,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 95d76d9156f7f1a41a7798657d6a890e, type: 2}
+  - {fileID: 2100000, guid: 073738144258e02418e5f4ec3538f113, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

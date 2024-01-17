@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     {
          if (wrongMove) 
         {
-            GameManager.Instance.PlayerFell();
+            GameManager.Instance.PlayerLost();
             wrongMove = false; // Set the flag to true to prevent further calls
         }
     }

@@ -13,7 +13,6 @@ public class GameManager : MonoBehaviour
         Moving,
         GameOver
     }
-
     [SerializeField] private Transform Player;
     [SerializeField] private GameObject menuPanel;
     [SerializeField] private GameObject gamePanel;
@@ -32,12 +31,16 @@ public class GameManager : MonoBehaviour
     private Vector2 touchStart;
     private Vector2 touchEnd;
     private bool isSwiping = false;
-
+    private float movementSpeed = 2.5f; // Adjust this speed in the Unity Inspector
+    private Vector3 velocity = Vector3.zero; // For SmoothDamp
     private const float boundary = 2.5f; // Half the size of the 5x5 area
     private const float boundaryOffset = 0.1f; // Offset to prevent player from getting too close to the boundary
     [SerializeField] private float rotationSpeed = 100f;
     private Vector3 targetDirection;
     [SerializeField] private string[] movedAnimations;
+    [SerializeField] private ParticleSystem playerFellParticles;
+
+    public Animator playerAnimator;
 
     void Awake()
     {
@@ -74,7 +77,7 @@ public class GameManager : MonoBehaviour
             CurrentPlatform = StartPlatform;
 
             // Schedule the removal of StartPlatform after a few seconds
-            StartCoroutine(DeactivateAfterDelay(StartPlatform.gameObject, 2f)); // Set the delay as needed
+            StartCoroutine(DeactivateStartPlatformAfterDelay(StartPlatform.gameObject, 2f)); // Set the delay as needed
 
             StartCoroutine(SpawnPlatform());
             gameStartedPreviously = true;
@@ -162,8 +165,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    [SerializeField] public float movementSpeed = 10f; // Adjust this speed in the Unity Inspector
-    private Vector3 velocity = Vector3.zero; // For SmoothDamp
+
     private void HandleSwipe()
     {
         Vector2 swipeDirection = touchEnd - touchStart;
@@ -271,7 +273,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Decide whether to spawn an extra points power-up
-        if (Random.value <  PowerUps.Instance.extraPointsSpawnChance && ! PowerUps.Instance.isExtraPointsActive)
+        if (Random.value < PowerUps.Instance.extraPointsSpawnChance && !PowerUps.Instance.isExtraPointsActive)
         {
             Vector3 powerUpPosition = CurrentPlatform.position;
             float powerUpVerticalOffset = 0.5f; // Manually set the vertical offset
@@ -355,60 +357,41 @@ public class GameManager : MonoBehaviour
         return nextPosition;
     }
 
-    private IEnumerator DeactivateAfterDelay(GameObject obj, float delay)
+    private IEnumerator DeactivateStartPlatformAfterDelay(GameObject obj, float delay)
     {
         yield return new WaitForSeconds(delay);
-        obj.SetActive(false);
+        obj.SetActive(false); // Turn off the StartPlatform
     }
 
-    [SerializeField] private ParticleSystem playerFellParticles;
-    //private bool hasFallen = false;
-
-    public Animator playerAnimator;
-
-    public void PlayerFell()
-    {
-        StartCoroutine(PlayerDeathCoroutine());
-    }
-    public IEnumerator PlayerDeathCoroutine()
+    public void PlayerLost() { StartCoroutine(PlayerLostCoroutine()); }
+    private IEnumerator PlayerLostCoroutine()
     {
         // Play animation
-        playerAnimator.SetTrigger("Death");
+        playerAnimator.SetTrigger("Lost");
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f); // The amount of time to wait after player lost animation
 
-        CurrentState = GameState.GameOver;
-        gamePanel.SetActive(false);
-        if (gameOverPanel != null)
+        CurrentState = GameState.GameOver; // Prevent the player from moving after losing
+        gamePanel.SetActive(false); // Turn off the game panel
+        if (gameOverPanel != null) // Turn on the game over panel
         {
             gameOverPanel.SetActive(true);
         }
-
         // Show the final score
         ScoreManager.Instance.ShowFinalScore();
         ScoreManager.Instance.ShowHighScore();
     }
 
-    // Go back to menu
-    public void GoToMenu()
+    public void GoToMenu() // Menu Button on Game Over Screen
     {
         CurrentState = GameState.Menu;
-        // Reset the game over panel
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(false);
-        }
-        // Reset the menu panel
-        if (menuPanel != null)
-        {
-            menuPanel.SetActive(true);
-        }
+        if (gameOverPanel != null) { gameOverPanel.SetActive(false); }  // Reset the game over panel
+        if (menuPanel != null) { menuPanel.SetActive(true); } // Reset the menu panel
     }
 
-    public void ResetGame()
+    public void ResetGame() // Restart Button on Game Over Screen
     {
-        transitionController.StartFadeOut();
-
+        transitionController.PlayTransition();
         StartCoroutine(ResetGameCoroutine());
     }
 
@@ -418,7 +401,7 @@ public class GameManager : MonoBehaviour
         playerAnimator.Rebind();
         //playerAnimator.SetTrigger("Reset");
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.5f);
         // After resetting other game-related components, you can resume the default animation state
         playerAnimator.SetTrigger("Idle");
 
@@ -427,12 +410,8 @@ public class GameManager : MonoBehaviour
         {
             StartPlatform.gameObject.SetActive(true);
             StartPlatform.position = new Vector3(0, 0, 0);
-            //Player.position = StartPlatform.position; // Reset player position to the start position
         }
-        else
-        {
-            Debug.LogError("StartPlatform is not assigned in the GameManager.");
-        }
+
         // 1. Reset GameState
         CurrentState = GameState.ReadyForInput;
 
@@ -451,16 +430,12 @@ public class GameManager : MonoBehaviour
             Destroy(previousPlatform.gameObject);
         }
 
-        //CurrentPlatform = Instantiate(StartPlatform, new Vector3(0, 0, 0), Quaternion.identity);
         CurrentPlatform = StartPlatform;
         previousPlatform = null;
         isFirstPlatform = true;
 
         // 4. UI Elements
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(false);
-        }
+        if (gameOverPanel != null) { gameOverPanel.SetActive(false); }
         gamePanel.SetActive(true);
 
         // 5. Reset Touch Input and Swipe Handling
@@ -471,10 +446,8 @@ public class GameManager : MonoBehaviour
         // 6. Score and High Score Reset (if applicable)
         ScoreManager.Instance.ResetScore();
         // ScoreManager.Instance.ResetHighScore(); // If you have a high score system
-        StartCoroutine(DeactivateAfterDelay(StartPlatform.gameObject, 2f)); // Set the delay as needed
+        StartCoroutine(DeactivateStartPlatformAfterDelay(StartPlatform.gameObject, 2f)); // Set the delay as needed
         StopCoroutine(SpawnPlatform());
         StartCoroutine(SpawnPlatform());
-
     }
-
 }
