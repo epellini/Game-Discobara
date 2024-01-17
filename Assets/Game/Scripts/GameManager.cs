@@ -33,14 +33,11 @@ public class GameManager : MonoBehaviour
     private Vector2 touchEnd;
     private bool isSwiping = false;
 
-    private float normalSpawnDelay = 1f; // Normal delay between platform spawns
-    private float slowMotionSpawnDelay = 2f; // Delay during slow motion
-    private bool isSlowMotionActive = false;
-
     private const float boundary = 2.5f; // Half the size of the 5x5 area
     private const float boundaryOffset = 0.1f; // Offset to prevent player from getting too close to the boundary
-
-
+    [SerializeField] private float rotationSpeed = 100f;
+    private Vector3 targetDirection;
+    [SerializeField] private string[] movedAnimations;
 
     void Awake()
     {
@@ -90,11 +87,6 @@ public class GameManager : MonoBehaviour
             Debug.Log("Game started - SECOND time");
         }
     }
-
-
-    [SerializeField] private float rotationSpeed = 100f;
-    private Vector3 targetDirection;
-    [SerializeField] private string[] movedAnimations;
 
     void Update()
     {
@@ -216,6 +208,7 @@ public class GameManager : MonoBehaviour
         CurrentState = GameState.Moving;
     }
 
+
     private void FixedUpdate()
     {
         if (CurrentState != GameState.Moving) return;
@@ -256,19 +249,6 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public void ActivateSlowMotion()
-    {
-        isSlowMotionActive = true;
-        StartCoroutine(SlowMotionDuration());
-    }
-
-    private IEnumerator SlowMotionDuration()
-    {
-        yield return new WaitForSeconds(5f); // Duration of the slow motion
-        isSlowMotionActive = false;
-    }
-
-
     private void CreatePlatform(Vector3 position)
     {
         float platformHeight = StartPlatform.position.y;
@@ -285,6 +265,15 @@ public class GameManager : MonoBehaviour
             Instantiate(powerUpPrefab, powerUpPosition, Quaternion.identity, CurrentPlatform);
         }
 
+        // Decide whether to spawn an extra points power-up
+        if (Random.value < powerUpExtraPointsSpawnChance && !isExtraPointsActive)
+        {
+            Vector3 powerUpPosition = CurrentPlatform.position;
+            float powerUpVerticalOffset = 0.5f; // Manually set the vertical offset
+            powerUpPosition.y += powerUpVerticalOffset; // Position it above the platform
+            Instantiate(powerUpExtraPointsPrefab, powerUpPosition, Quaternion.identity, CurrentPlatform);
+        }
+
         // Handle the previous platform
         if (!isFirstPlatform && previousPlatform != null)
         {
@@ -295,8 +284,40 @@ public class GameManager : MonoBehaviour
     }
 
 
-    [SerializeField] private GameObject powerUpPrefab; // Assign this in the inspector
+    private float normalSpawnDelay = 1f; // Normal delay between platform spawns
+    private float slowMotionSpawnDelay = 2f; // Delay during slow motion
+    private bool isSlowMotionActive = false;
     private float powerUpSpawnChance = 0.01f; //  3% chance of spawning a power-up
+    [SerializeField] private GameObject powerUpPrefab; // Assign this in the inspector
+    [SerializeField] private GameObject powerUpExtraPointsPrefab; // Assign this in the inspector
+    private float powerUpExtraPointsSpawnChance = 0.1f; // 
+    public bool isExtraPointsActive = false;
+
+    public void ActivateExtraPoints()
+    {
+        playerAnimator.SetTrigger("Special");
+        isExtraPointsActive = true;
+        StartCoroutine(ExtraPointsDuration());
+    }
+
+    private IEnumerator ExtraPointsDuration()
+    {
+        yield return new WaitForSeconds(5f); // Duration of the extra points
+        isExtraPointsActive = false;
+        playerAnimator.SetTrigger("Reset");
+    }
+
+    public void ActivateSlowMotion()
+    {
+        isSlowMotionActive = true;
+        StartCoroutine(SlowMotionDuration());
+    }
+
+    private IEnumerator SlowMotionDuration()
+    {
+        yield return new WaitForSeconds(5f); // Duration of the slow motion
+        isSlowMotionActive = false;
+    }
 
     private IEnumerator SpawnPlatform()
     {
@@ -339,7 +360,6 @@ public class GameManager : MonoBehaviour
         return position.x >= -boundary + boundaryOffset && position.x <= boundary - boundaryOffset &&
                position.z >= -boundary + boundaryOffset && position.z <= boundary - boundaryOffset;
     }
-
 
 
     private Vector3 CalculateNextPlatformPosition(Transform currentPlatform, int direction)
@@ -426,9 +446,13 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator ResetGameCoroutine()
     {
-        playerAnimator.SetTrigger("Reset");
+        // Reset the animation controller
+        playerAnimator.Rebind();
+        //playerAnimator.SetTrigger("Reset");
 
         yield return new WaitForSeconds(1f);
+        // After resetting other game-related components, you can resume the default animation state
+        playerAnimator.SetTrigger("Idle");
 
         // Ensure the StartPlatform is active
         if (StartPlatform != null)

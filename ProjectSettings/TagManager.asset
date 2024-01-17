@@ -7,6 +7,8 @@ TagManager:
   - Platform
   - PowerUp
   - Wrong
+  - ExtraPoints
+  - SlowMotion
   layers:
   - Default
   - TransparentFX

@@ -2,22 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
-
 public class PlayerController : MonoBehaviour
 {
-    private bool hasFallen = false;
-    public SlowMotionCountdown slowMotionCountdown; // Assign this in the inspector
+    private bool wrongMove = false;
+    public EffectCountdown effectCountdown;
     void Update()
     {
-         if (hasFallen) 
+         if (wrongMove) 
         {
             GameManager.Instance.PlayerFell();
-            
-           //GetComponent<Rigidbody>().isKinematic = true;
-            hasFallen = false; // Set the flag to true to prevent further calls
+            wrongMove = false; // Set the flag to true to prevent further calls
         }
     }
-
 
     void OnCollisionEnter(Collision collision)
     {
@@ -28,24 +24,29 @@ public class PlayerController : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Wrong"))
         {
-            hasFallen = true;
+            wrongMove = true;
         }
     }
 
     public void ResetPlayer()
     {
-        hasFallen = false;
-        GetComponent<Rigidbody>().isKinematic = false;
+        wrongMove = false;
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("PowerUp"))
+        if (other.CompareTag("SlowMotion"))
         {
             GameManager.Instance.ActivateSlowMotion();
-            slowMotionCountdown.StartCountdown();
-            Destroy(other.gameObject); // Remove the power-up after pickup
+            effectCountdown.StartSlowMotionCountdown();
+            Destroy(other.gameObject);
+        }
+
+        if (other.CompareTag("ExtraPoints"))
+        {
+            GameManager.Instance.ActivateExtraPoints();
+            effectCountdown.StartExtraPointsCountdown();
+            Destroy(other.gameObject);
         }
     }
-
 }

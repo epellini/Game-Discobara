@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 5156735079790714233}
   - component: {fileID: 4144195416819740121}
   m_Layer: 0
-  m_Name: Powerup_SlowTime
-  m_TagString: SlowMotion
+  m_Name: Powerup_ExtraPoints
+  m_TagString: ExtraPoints
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6cf4cb9e20877c94e93c3d5c990ad2a8, type: 2}
+  - {fileID: 2100000, guid: 073738144258e02418e5f4ec3538f113, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

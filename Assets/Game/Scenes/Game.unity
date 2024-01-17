@@ -728,6 +728,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1305879917}
   - {fileID: 1841815083}
   - {fileID: 750480083}
   m_Father: {fileID: 1426800955}
@@ -1031,7 +1032,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f343a9ea770ec044ba8a69a73119e58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slowMotionCountdown: {fileID: 1305879916}
+  effectCountdown: {fileID: 1305879916}
 --- !u!54 &481508362
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1510,7 +1511,6 @@ GameObject:
   m_Component:
   - component: {fileID: 705507995}
   - component: {fileID: 705507994}
-  - component: {fileID: 705507996}
   m_Layer: 0
   m_Name: MainLight
   m_TagString: Untagged
@@ -1595,18 +1595,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -158.06, z: 0}
---- !u!114 &705507996
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 705507993}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &750480080
 GameObject:
   m_ObjectHideFlags: 0
@@ -1851,11 +1839,13 @@ MonoBehaviour:
   PlatformPreviewPrefab: {fileID: 4266329005899544926, guid: 6e89b5e3b4802df4f9720ec0ccc204c0, type: 3}
   rotationSpeed: 100
   movedAnimations:
-  - Moved
+  - Moved1
   - Moved2
   - Moved3
   movementSpeed: 1
   powerUpPrefab: {fileID: 8247843832711000007, guid: fa86d9a0cc7f17340af303da2fb64f60, type: 3}
+  powerUpExtraPointsPrefab: {fileID: 8247843832711000007, guid: 8c16fdc847441b64e986502d1733bd0f, type: 3}
+  isExtraPointsActive: 0
   playerFellParticles: {fileID: 0}
   playerAnimator: {fileID: 1817947868}
 --- !u!4 &770550488
@@ -3066,7 +3056,7 @@ GameObject:
   - component: {fileID: 1305879917}
   - component: {fileID: 1305879916}
   m_Layer: 0
-  m_Name: SlowDownEffect
+  m_Name: EffectCountdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3093,12 +3083,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1305879915}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.43489236, y: -0.34040543, z: 0.24306929}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -400.32214, y: -711.36334, z: 0.18005136}
+  m_LocalScale: {x: 0.74074084, y: 0.74074084, z: 0.74074084}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 339339105}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1363137782
 GameObject:
@@ -3645,7 +3635,7 @@ Light:
   m_Type: 0
   m_Shape: 0
   m_Color: {r: 0, g: 1, b: 0.09615183, a: 1}
-  m_Intensity: 11.61
+  m_Intensity: 7
   m_Range: 15
   m_SpotAngle: 13.9
   m_InnerSpotAngle: 1
@@ -3684,7 +3674,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 2
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -4170,7 +4160,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 575228427}
   - {fileID: 770550488}
-  - {fileID: 1305879917}
   - {fileID: 1045216598}
   - {fileID: 958184172}
   - {fileID: 1426800955}

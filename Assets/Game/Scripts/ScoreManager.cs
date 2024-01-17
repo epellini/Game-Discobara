@@ -31,8 +31,8 @@ public class ScoreManager : MonoBehaviour
 
     public void IncrementScore()
     {
-        // Add 1 to the current score
-        currentScore++;
+        int scoreIncrement = GameManager.Instance.isExtraPointsActive ? 2 : 1;
+        currentScore += scoreIncrement; // Increase score by 2 if extra points are active, otherwise by 1
         ShowCurrentScore();
 
         // Save High Score
