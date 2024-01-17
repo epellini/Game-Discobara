@@ -37,14 +37,14 @@ public class PlayerController : MonoBehaviour
     {
         if (other.CompareTag("SlowMotion"))
         {
-            GameManager.Instance.ActivateSlowMotion();
+            PowerUps.Instance.ActivateSlowMotion();
             effectCountdown.StartSlowMotionCountdown();
             Destroy(other.gameObject);
         }
 
         if (other.CompareTag("ExtraPoints"))
         {
-            GameManager.Instance.ActivateExtraPoints();
+            PowerUps.Instance.ActivateExtraPoints();
             effectCountdown.StartExtraPointsCountdown();
             Destroy(other.gameObject);
         }

@@ -162,10 +162,8 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
-    [SerializeField] private float movementSpeed = 10f; // Adjust this speed in the Unity Inspector
+    [SerializeField] public float movementSpeed = 10f; // Adjust this speed in the Unity Inspector
     private Vector3 velocity = Vector3.zero; // For SmoothDamp
-
     private void HandleSwipe()
     {
         Vector2 swipeDirection = touchEnd - touchStart;
@@ -175,14 +173,18 @@ public class GameManager : MonoBehaviour
             if (swipeDirection.x > 0)
             {
                 // Right swipe
-                playerAnimator.SetTrigger("Moved");
+                int randomIndex = Random.Range(0, movedAnimations.Length);
+                string selectedTrigger = movedAnimations[randomIndex];
+                playerAnimator.SetTrigger(selectedTrigger);
                 targetDirection = Vector3.back;
                 TargetDestination = Player.position + new Vector3(0, 0, -playerMoveDistance);
             }
             else
             {
                 // Left swipe
-                playerAnimator.SetTrigger("Moved");
+                int randomIndex = Random.Range(0, movedAnimations.Length);
+                string selectedTrigger = movedAnimations[randomIndex];
+                playerAnimator.SetTrigger(selectedTrigger);
                 targetDirection = Vector3.forward;
                 TargetDestination = Player.position + new Vector3(0, 0, playerMoveDistance);
             }
@@ -193,21 +195,24 @@ public class GameManager : MonoBehaviour
             if (swipeDirection.y > 0)
             {
                 // Up swipe
-                playerAnimator.SetTrigger("Moved");
+                int randomIndex = Random.Range(0, movedAnimations.Length);
+                string selectedTrigger = movedAnimations[randomIndex];
+                playerAnimator.SetTrigger(selectedTrigger);
                 targetDirection = Vector3.right;
                 TargetDestination = Player.position + new Vector3(playerMoveDistance, 0, 0);
             }
             else
             {
                 // Down swipe
-                playerAnimator.SetTrigger("Moved");
+                int randomIndex = Random.Range(0, movedAnimations.Length);
+                string selectedTrigger = movedAnimations[randomIndex];
+                playerAnimator.SetTrigger(selectedTrigger);
                 targetDirection = Vector3.left;
                 TargetDestination = Player.position + new Vector3(-playerMoveDistance, 0, 0);
             }
         }
         CurrentState = GameState.Moving;
     }
-
 
     private void FixedUpdate()
     {
@@ -257,21 +262,21 @@ public class GameManager : MonoBehaviour
         CurrentPlatform = Instantiate(Platform, position, Quaternion.identity);
 
         // Decide whether to spawn a power-up
-        if (Random.value < powerUpSpawnChance)
+        if (Random.value < PowerUps.Instance.slowMotionSpawnChance)
         {
             Vector3 powerUpPosition = CurrentPlatform.position;
             float powerUpVerticalOffset = 0.5f; // Manually set the vertical offset
             powerUpPosition.y += powerUpVerticalOffset; // Position it above the platform
-            Instantiate(powerUpPrefab, powerUpPosition, Quaternion.identity, CurrentPlatform);
+            Instantiate(PowerUps.Instance.powerUpSlowMotionPrefab, powerUpPosition, Quaternion.identity, CurrentPlatform);
         }
 
         // Decide whether to spawn an extra points power-up
-        if (Random.value < powerUpExtraPointsSpawnChance && !isExtraPointsActive)
+        if (Random.value <  PowerUps.Instance.extraPointsSpawnChance && ! PowerUps.Instance.isExtraPointsActive)
         {
             Vector3 powerUpPosition = CurrentPlatform.position;
             float powerUpVerticalOffset = 0.5f; // Manually set the vertical offset
             powerUpPosition.y += powerUpVerticalOffset; // Position it above the platform
-            Instantiate(powerUpExtraPointsPrefab, powerUpPosition, Quaternion.identity, CurrentPlatform);
+            Instantiate(PowerUps.Instance.powerUpExtraPointsPrefab, powerUpPosition, Quaternion.identity, CurrentPlatform);
         }
 
         // Handle the previous platform
@@ -283,47 +288,11 @@ public class GameManager : MonoBehaviour
         isFirstPlatform = false;
     }
 
-
-    private float normalSpawnDelay = 1f; // Normal delay between platform spawns
-    private float slowMotionSpawnDelay = 2f; // Delay during slow motion
-    private bool isSlowMotionActive = false;
-    private float powerUpSpawnChance = 0.01f; //  3% chance of spawning a power-up
-    [SerializeField] private GameObject powerUpPrefab; // Assign this in the inspector
-    [SerializeField] private GameObject powerUpExtraPointsPrefab; // Assign this in the inspector
-    private float powerUpExtraPointsSpawnChance = 0.1f; // 
-    public bool isExtraPointsActive = false;
-
-    public void ActivateExtraPoints()
-    {
-        playerAnimator.SetTrigger("Special");
-        isExtraPointsActive = true;
-        StartCoroutine(ExtraPointsDuration());
-    }
-
-    private IEnumerator ExtraPointsDuration()
-    {
-        yield return new WaitForSeconds(5f); // Duration of the extra points
-        isExtraPointsActive = false;
-        playerAnimator.SetTrigger("Reset");
-    }
-
-    public void ActivateSlowMotion()
-    {
-        isSlowMotionActive = true;
-        StartCoroutine(SlowMotionDuration());
-    }
-
-    private IEnumerator SlowMotionDuration()
-    {
-        yield return new WaitForSeconds(5f); // Duration of the slow motion
-        isSlowMotionActive = false;
-    }
-
     private IEnumerator SpawnPlatform()
     {
         while (CurrentState != GameState.GameOver)
         {
-            yield return new WaitForSeconds(isSlowMotionActive ? slowMotionSpawnDelay : normalSpawnDelay);
+            yield return new WaitForSeconds(PowerUps.Instance.isSlowMotionActive ? PowerUps.Instance.slowMotionSpawnDelay : PowerUps.Instance.normalSpawnDelay);
 
             bool validPositionFound = false;
             Vector3 previewPosition = Vector3.zero;
@@ -360,7 +329,6 @@ public class GameManager : MonoBehaviour
         return position.x >= -boundary + boundaryOffset && position.x <= boundary - boundaryOffset &&
                position.z >= -boundary + boundaryOffset && position.z <= boundary - boundaryOffset;
     }
-
 
     private Vector3 CalculateNextPlatformPosition(Transform currentPlatform, int direction)
     {
