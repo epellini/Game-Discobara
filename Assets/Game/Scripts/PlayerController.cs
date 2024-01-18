@@ -4,8 +4,10 @@ using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
 public class PlayerController : MonoBehaviour
 {
+
     private bool wrongMove = false;
     public EffectCountdown effectCountdown;
+
     void Update()
     {
          if (wrongMove) 

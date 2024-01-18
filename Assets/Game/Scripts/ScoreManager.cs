@@ -1,17 +1,21 @@
 using UnityEngine;
 using TMPro;
+using System;
 
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance;
+    public GameManager gameManager; // Reference to GameManager.cs
     public TextMeshProUGUI currentScoreText; // Text that will updated on each move during gameplay - GAMEPLAY SCREEN
     public TextMeshProUGUI finalScoreText; // Text that will show at end of game on GameOver Screen - GAME OVER SCREEN
     public TextMeshProUGUI highScoreText; // Text that will also show at end of game on GameOver Screen - GAME OVER SCREEN
     public TextMeshProUGUI newHighScoreText; // Text that will only show if the player beats the high score - GAME OVER SCREEN 
+    public PlayerController playerController; // Reference to PlayerController.cs
     private int currentScore = -1; // Start at -1 so that the first platform the player lands on will be 0
     private int finalScore = 0; // Start at 0
     private int highScore = 0; // Start at 0
     private bool newHighScoreAchieved = false;
+    public GameObject FloatingTextPrefab; // Floating text prefab for points added animation
 
     void Awake()
     {
@@ -26,7 +30,7 @@ public class ScoreManager : MonoBehaviour
     private void Start()
     {
         highScore = PlayerPrefs.GetInt("HighScore", 0);
-        currentScoreText.text = "Score: " + currentScore;
+        currentScoreText.text = currentScore.ToString();
     }
 
     public void IncrementScore()
@@ -50,12 +54,17 @@ public class ScoreManager : MonoBehaviour
     // Methods for displaying score on UI
     public void ShowCurrentScore() // Called from PlayerController.cs
     {
-        currentScoreText.text = "Score: " + currentScore;
+        currentScoreText.text = currentScore.ToString();
+        // Call points added animation here
+        if (FloatingTextPrefab)
+        {
+            ShowFloatingText();
+        }
     }
 
     public void ShowFinalScore() // Called from GameManager.cs on GameOver Screen
     {
-        finalScoreText.text = "Score: " + currentScore;
+        finalScoreText.text = "YOUR SCORE:\n" + currentScore;
     }
 
     public void ShowHighScore() // Called from GameManager.cs on GameOver Screen
@@ -77,7 +86,7 @@ public class ScoreManager : MonoBehaviour
         {
             highScoreText.gameObject.SetActive(false);
             newHighScoreText.gameObject.SetActive(true);
-            newHighScoreText.text = "You've reached a new High Score: " + highScore;
+            newHighScoreText.text = "YOU'VE REACHED A NEW HIGH SCORE! \n" + highScore;
         }
     }
 
@@ -85,4 +94,41 @@ public class ScoreManager : MonoBehaviour
     {
         currentScore = -1;
     }
+
+    void ShowFloatingText()
+    {
+        // Do not show floating text for the first point
+        if (currentScore == 0)
+        {
+            return;
+        }
+        if (FloatingTextPrefab && playerController)
+        {
+            Vector3 playerPosition = playerController.transform.position;
+            Debug.Log("Player position: " + playerPosition);
+
+            // Define the desired rotation
+            Quaternion desiredRotation = Quaternion.Euler(0, 90, 0);
+
+            Vector3 textPosition = playerPosition + Vector3.up * 0.05f;
+            GameObject go = Instantiate(FloatingTextPrefab, textPosition, desiredRotation);
+
+            Debug.Log("Text instantiated at position: " + textPosition);
+
+            TextMeshPro textMesh = go.GetComponent<TextMeshPro>();
+            if (textMesh)
+            {
+                textMesh.text = "+" + (PowerUps.Instance.isExtraPointsActive ? 2 : 1);
+            }
+            else
+            {
+                Debug.LogError("TextMeshPro component not found on FloatingTextPrefab.");
+            }
+        }
+        else
+        {
+            Debug.LogError("FloatingTextPrefab is not assigned in the ScoreManager.");
+        }
+    }
+
 }

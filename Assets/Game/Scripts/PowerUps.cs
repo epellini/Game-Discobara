@@ -6,6 +6,7 @@ using UnityEngine.SocialPlatforms.Impl;
 public class PowerUps : MonoBehaviour
 {
     public static PowerUps Instance;
+    public CameraBounceZoom cameraBounceZoom;
     [SerializeField] private Animator playerAnimator; // Assign this in the inspector
     [SerializeField] private GameManager gameManager; // Assign this in the inspector
     [SerializeField] public GameObject powerUpSlowMotionPrefab; // Assign this in the inspector
@@ -13,8 +14,8 @@ public class PowerUps : MonoBehaviour
     public float normalSpawnDelay = 1f; // Normal delay between platform spawns
     public float slowMotionSpawnDelay = 2f; // Delay during slow motion
     public bool isSlowMotionActive = false;
-    public float slowMotionSpawnChance = 0.01f; //  3% chance of spawning a power-up
-    public float extraPointsSpawnChance = 0.1f; // 
+    public float slowMotionSpawnChance = 3f; //  3% chance of spawning a power-up
+    public float extraPointsSpawnChance = 6f; //
     public bool isExtraPointsActive = false;
     void Awake()
     {
@@ -31,6 +32,7 @@ public class PowerUps : MonoBehaviour
 
     public void ActivateExtraPoints()
     {
+        StartCoroutine(cameraBounceZoom.BounceAndZoom(6f, 0.2f, 0.15f));
         playerAnimator.SetTrigger("Special");
         isExtraPointsActive = true;
         StartCoroutine(ExtraPointsDuration());
@@ -38,7 +40,7 @@ public class PowerUps : MonoBehaviour
 
     private IEnumerator ExtraPointsDuration()
     {
-        yield return new WaitForSeconds(5f); // Duration of the extra points
+        yield return new WaitForSeconds(6f); // Duration of the extra points
         isExtraPointsActive = false;
         playerAnimator.SetTrigger("Reset");
     }

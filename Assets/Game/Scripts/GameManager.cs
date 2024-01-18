@@ -362,11 +362,15 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(delay);
         obj.SetActive(false); // Turn off the StartPlatform
     }
+    public CameraBounceZoom cameraBounceZoom;
 
     public void PlayerLost() { StartCoroutine(PlayerLostCoroutine()); }
     private IEnumerator PlayerLostCoroutine()
     {
+        // Play sound effect
+        //AudioManager.Instance.PlaySoundEffect(AudioManager.SoundEffect.PlayerFell);
         // Play animation
+        StartCoroutine(cameraBounceZoom.DeathShake(0.3f, 0.03f));
         playerAnimator.SetTrigger("Lost");
 
         yield return new WaitForSeconds(1f); // The amount of time to wait after player lost animation
@@ -397,6 +401,12 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator ResetGameCoroutine()
     {
+        // Reset Camera Bounce and Zoom Effects
+        CameraBounceZoom cameraBounceZoom = Camera.main.GetComponent<CameraBounceZoom>();
+        if (cameraBounceZoom != null)
+        {
+            cameraBounceZoom.ResetEffects();
+        }
         // Reset the animation controller
         playerAnimator.Rebind();
         //playerAnimator.SetTrigger("Reset");
