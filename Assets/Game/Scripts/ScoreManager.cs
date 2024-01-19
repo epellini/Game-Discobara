@@ -67,7 +67,7 @@ public class ScoreManager : MonoBehaviour
 
     public void ShowFinalScore() // Called from GameManager.cs on GameOver Screen
     {
-        finalScoreText.text = "YOUR SCORE:\n" + currentScore;
+        finalScoreText.text = currentScore.ToString();
         ShowEndGameCard();
     }
 
