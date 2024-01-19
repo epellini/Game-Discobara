@@ -23,7 +23,7 @@ public class CameraBounceZoom : MonoBehaviour
 
     public void BounceAndZoomCamera()
     {
-        StartCoroutine(BounceAndZoom(6f, 0.2f, 0.15f));
+        StartCoroutine(BounceAndZoom(8f, 0.2f, 0.15f));
     }
 
     public IEnumerator BounceAndZoom(float duration, float bounceMagnitude, float zoomMagnitude)

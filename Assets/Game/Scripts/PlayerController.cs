@@ -37,12 +37,12 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("SlowMotion"))
-        {
-            PowerUps.Instance.ActivateSlowMotion();
-            effectCountdown.StartSlowMotionCountdown();
-            Destroy(other.gameObject);
-        }
+        // if (other.CompareTag("SlowMotion"))
+        // {
+        //     PowerUps.Instance.ActivateSlowMotion();
+        //     effectCountdown.StartSlowMotionCountdown();
+        //     Destroy(other.gameObject);
+        // }
 
         if (other.CompareTag("ExtraPoints"))
         {

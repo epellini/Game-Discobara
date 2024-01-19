@@ -6,7 +6,7 @@ public class EffectCountdown : MonoBehaviour
     public TextMeshProUGUI slowMotionCountdownText; 
     public TextMeshProUGUI extraPointsCountdownText; 
     private float slowMotionDuration = 5f; // Duration of the countdown in seconds
-    private float extraPointsDuration = 7f; // Duration of the countdown in seconds
+    private float extraPointsDuration = 8f; // Duration of the countdown in seconds
 
     void Start()
     {
@@ -43,7 +43,7 @@ public class EffectCountdown : MonoBehaviour
         float remainingTime = extraPointsDuration;
         while (remainingTime > 0)
         {
-            extraPointsCountdownText.text = remainingTime.ToString("F0"); // F0 means no decimal places
+            extraPointsCountdownText.text = remainingTime.ToString("DOUBLE POINTS! \n" + "0"); // F0 means no decimal places
             yield return new WaitForSecondsRealtime(0.1f);
             remainingTime -= 0.1f;
         }

@@ -16,6 +16,9 @@ public class ScoreManager : MonoBehaviour
     private int highScore = 0; // Start at 0
     private bool newHighScoreAchieved = false;
     public GameObject FloatingTextPrefab; // Floating text prefab for points added animation
+    public GameObject particleEffectPrefab;
+    public GameObject gameOverCard; // Assign this in the inspector
+    public GameObject newHighScoreCard;
 
     void Awake()
     {
@@ -65,18 +68,34 @@ public class ScoreManager : MonoBehaviour
     public void ShowFinalScore() // Called from GameManager.cs on GameOver Screen
     {
         finalScoreText.text = "YOUR SCORE:\n" + currentScore;
+        ShowEndGameCard();
     }
+
+    private void ShowEndGameCard()
+    {
+        if (newHighScoreAchieved)
+        {
+            newHighScoreCard.SetActive(true);
+            gameOverCard.SetActive(false);
+        }
+        else
+        {
+            gameOverCard.SetActive(true);
+            newHighScoreCard.SetActive(false);
+        }
+    }
+
 
     public void ShowHighScore() // Called from GameManager.cs on GameOver Screen
     {
-        if (!newHighScoreAchieved)
-        {
-            highScoreText.text = "High Score: " + highScore;
-        }
-
         if (newHighScoreAchieved)
         {
             ShowNewHighScore();
+        }
+        else
+        {
+            highScoreText.text = "High Score: " + highScore;
+            newHighScoreText.gameObject.SetActive(false);
         }
     }
 
@@ -84,15 +103,19 @@ public class ScoreManager : MonoBehaviour
     {
         if (newHighScoreAchieved)
         {
+            TriggerHighScoreParticleEffect();
             highScoreText.gameObject.SetActive(false);
             newHighScoreText.gameObject.SetActive(true);
-            newHighScoreText.text = "YOU'VE REACHED A NEW HIGH SCORE! \n" + highScore;
+            newHighScoreText.text = highScore.ToString();
         }
     }
 
     public void ResetScore()
     {
         currentScore = -1;
+        newHighScoreAchieved = false;
+        gameOverCard.SetActive(false);
+        newHighScoreCard.SetActive(false);
     }
 
     void ShowFloatingText()
@@ -128,6 +151,26 @@ public class ScoreManager : MonoBehaviour
         else
         {
             Debug.LogError("FloatingTextPrefab is not assigned in the ScoreManager.");
+        }
+    }
+
+
+    private void TriggerHighScoreParticleEffect()
+    {
+        if (particleEffectPrefab)
+        {
+            // Choose a suitable position for the particle effect, e.g., above the high score text
+            Vector3 effectPosition = newHighScoreText.transform.position + Vector3.up * 0.5f; // Adjust as needed
+
+            // Instantiate the particle effect
+            GameObject effectInstance = Instantiate(particleEffectPrefab, effectPosition, Quaternion.identity);
+
+            // Optional: Destroy the effect after a certain duration, if it doesn't self-terminate
+            Destroy(effectInstance, 3f); // Adjust duration as needed
+        }
+        else
+        {
+            Debug.LogError("Particle effect prefab is not assigned in the ScoreManager.");
         }
     }
 

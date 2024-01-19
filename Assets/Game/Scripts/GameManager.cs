@@ -263,14 +263,14 @@ public class GameManager : MonoBehaviour
 
         CurrentPlatform = Instantiate(Platform, position, Quaternion.identity);
 
-        // Decide whether to spawn a power-up
-        if (Random.value < PowerUps.Instance.slowMotionSpawnChance)
-        {
-            Vector3 powerUpPosition = CurrentPlatform.position;
-            float powerUpVerticalOffset = 0.5f; // Manually set the vertical offset
-            powerUpPosition.y += powerUpVerticalOffset; // Position it above the platform
-            Instantiate(PowerUps.Instance.powerUpSlowMotionPrefab, powerUpPosition, Quaternion.identity, CurrentPlatform);
-        }
+        // // Decide whether to spawn a SLOW MOTION power-up
+        // if (Random.value < PowerUps.Instance.slowMotionSpawnChance && !PowerUps.Instance.isSlowMotionActive)
+        // {
+        //     Vector3 powerUpPosition = CurrentPlatform.position;
+        //     float powerUpVerticalOffset = 0.5f; // Manually set the vertical offset
+        //     powerUpPosition.y += powerUpVerticalOffset; // Position it above the platform
+        //     Instantiate(PowerUps.Instance.powerUpSlowMotionPrefab, powerUpPosition, Quaternion.identity, CurrentPlatform);
+        // }
 
         // Decide whether to spawn an extra points power-up
         if (Random.value < PowerUps.Instance.extraPointsSpawnChance && !PowerUps.Instance.isExtraPointsActive)
@@ -373,7 +373,7 @@ public class GameManager : MonoBehaviour
         StartCoroutine(cameraBounceZoom.DeathShake(0.3f, 0.03f));
         playerAnimator.SetTrigger("Lost");
 
-        yield return new WaitForSeconds(1f); // The amount of time to wait after player lost animation
+        yield return new WaitForSeconds(0.9f); // The amount of time to wait after player lost animation
 
         CurrentState = GameState.GameOver; // Prevent the player from moving after losing
         gamePanel.SetActive(false); // Turn off the game panel
@@ -402,16 +402,16 @@ public class GameManager : MonoBehaviour
     private IEnumerator ResetGameCoroutine()
     {
         // Reset Camera Bounce and Zoom Effects
+        // Reset the animation controller
+        playerAnimator.Rebind();
         CameraBounceZoom cameraBounceZoom = Camera.main.GetComponent<CameraBounceZoom>();
         if (cameraBounceZoom != null)
         {
             cameraBounceZoom.ResetEffects();
         }
-        // Reset the animation controller
-        playerAnimator.Rebind();
         //playerAnimator.SetTrigger("Reset");
 
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(0.8f);
         // After resetting other game-related components, you can resume the default animation state
         playerAnimator.SetTrigger("Idle");
 
