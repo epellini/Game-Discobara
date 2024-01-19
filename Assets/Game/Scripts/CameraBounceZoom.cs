@@ -8,6 +8,8 @@ public class CameraBounceZoom : MonoBehaviour
     private float originalLightIntensity;
     private Vector3 originalPosition;
     private float originalSize;
+    public bool isPlayerAlive = true;
+
 
     void Awake()
     {
@@ -30,6 +32,7 @@ public class CameraBounceZoom : MonoBehaviour
     {
         Vector3 originalPos = transform.localPosition;
         float originalSize = cam.orthographicSize;
+        isPlayerAlive = true;
 
         // Enable and adjust light at the start of the effect
         if (partyLight != null)
@@ -38,7 +41,7 @@ public class CameraBounceZoom : MonoBehaviour
         }
 
         float elapsed = 0f;
-        while (elapsed < duration)
+        while (elapsed < duration && isPlayerAlive)
         {
             // Bounce effect using a sine wave
             float y = Mathf.Sin(elapsed * Mathf.PI * 2) * bounceMagnitude;
@@ -75,6 +78,12 @@ public class CameraBounceZoom : MonoBehaviour
             yield return null;
         }
         transform.localPosition = originalPos;
+    }
+
+    public void OnPlayerDeath()
+    {
+        isPlayerAlive = false;
+        ResetEffects();
     }
 
     public void ResetEffects()

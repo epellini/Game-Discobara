@@ -395,6 +395,7 @@ public class GameManager : MonoBehaviour
 
     public void ResetGame() // Restart Button on Game Over Screen
     {
+        //cameraBounceZoom.OnPlayerDeath();
         transitionController.PlayTransition();
         StartCoroutine(ResetGameCoroutine());
     }
@@ -403,7 +404,6 @@ public class GameManager : MonoBehaviour
     {
         // Reset Camera Bounce and Zoom Effects
         // Reset the animation controller
-        playerAnimator.Rebind();
         CameraBounceZoom cameraBounceZoom = Camera.main.GetComponent<CameraBounceZoom>();
         if (cameraBounceZoom != null)
         {
@@ -412,6 +412,8 @@ public class GameManager : MonoBehaviour
         //playerAnimator.SetTrigger("Reset");
 
         yield return new WaitForSeconds(0.8f);
+        playerAnimator.Rebind();
+         cameraBounceZoom.OnPlayerDeath();
         // After resetting other game-related components, you can resume the default animation state
         playerAnimator.SetTrigger("Idle");
 
