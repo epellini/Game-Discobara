@@ -67,6 +67,7 @@ public class GameManager : MonoBehaviour
     private bool gameStartedPreviously = false;
     public void StartGame()
     {
+        SoundManager.Instance.ButtonPress();
         if (!gameStartedPreviously)
         {
             // First time starting the game
@@ -375,7 +376,7 @@ public class GameManager : MonoBehaviour
         playerAnimator.SetTrigger("Lost");
 
         yield return new WaitForSeconds(0.95f); // The amount of time to wait after player lost animation
-         // 3. Platform Handling
+                                                // 3. Platform Handling
         if (CurrentPlatform != null && CurrentPlatform != StartPlatform)
         {
             Destroy(CurrentPlatform.gameObject);
@@ -398,6 +399,7 @@ public class GameManager : MonoBehaviour
 
     public void GoToMenu() // Menu Button on Game Over Screen
     {
+        SoundManager.Instance.ButtonPress();
         CurrentState = GameState.Menu;
         if (gameOverPanel != null) { gameOverPanel.SetActive(false); }  // Reset the game over panel
         if (menuPanel != null) { menuPanel.SetActive(true); } // Reset the menu panel
@@ -405,6 +407,7 @@ public class GameManager : MonoBehaviour
 
     public void ResetGame() // Restart Button on Game Over Screen
     {
+        SoundManager.Instance.ButtonPress();
         //cameraBounceZoom.OnPlayerDeath();
         transitionController.PlayTransition();
         StartCoroutine(ResetGameCoroutine());
@@ -412,7 +415,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator ResetGameCoroutine()
     {
-       
+
         //transitionController.PlayTransition();
         // Reset Camera Bounce and Zoom Effects
         // Reset the animation controller
@@ -425,7 +428,7 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.8f);
         playerAnimator.Rebind();
-         cameraBounceZoom.OnPlayerDeath();
+        cameraBounceZoom.OnPlayerDeath();
         // After resetting other game-related components, you can resume the default animation state
         playerAnimator.SetTrigger("Idle");
 
@@ -478,6 +481,7 @@ public class GameManager : MonoBehaviour
 
     public void ShowTutorial()
     {
+        SoundManager.Instance.ButtonPress();
         // Show the tutorial panel
         tutorialPanel.SetActive(true);
         // Hide the menu panel
@@ -486,6 +490,7 @@ public class GameManager : MonoBehaviour
 
     public void HideTutorial()
     {
+        SoundManager.Instance.ButtonPress();
         // Hide the tutorial panel
         tutorialPanel.SetActive(false);
         // Show the menu panel

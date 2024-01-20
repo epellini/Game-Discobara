@@ -11,7 +11,7 @@ public class ScoreManager : MonoBehaviour
     public TextMeshProUGUI highScoreText; // Text that will also show at end of game on GameOver Screen - GAME OVER SCREEN
     public TextMeshProUGUI newHighScoreText; // Text that will only show if the player beats the high score - GAME OVER SCREEN 
     public PlayerController playerController; // Reference to PlayerController.cs
-    private int currentScore = -1; // Start at -1 so that the first platform the player lands on will be 0
+    private int currentScore = 0; // Start at -1 so that the first platform the player lands on will be 0
     private int finalScore = 0; // Start at 0
     private int highScore = 0; // Start at 0
     private bool newHighScoreAchieved = false;
@@ -112,7 +112,7 @@ public class ScoreManager : MonoBehaviour
 
     public void ResetScore()
     {
-        currentScore = -1;
+        currentScore = 0;
         newHighScoreAchieved = false;
         gameOverCard.SetActive(false);
         newHighScoreCard.SetActive(false);

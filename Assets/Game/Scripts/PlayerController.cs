@@ -21,11 +21,13 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Platform"))
         {
+            SoundManager.Instance.RightMove();
             ScoreManager.Instance.IncrementScore();
         }
 
         if (collision.gameObject.CompareTag("Wrong"))
         {
+            SoundManager.Instance.WrongMove();
             wrongMove = true;
         }
     }
@@ -46,6 +48,7 @@ public class PlayerController : MonoBehaviour
 
         if (other.CompareTag("ExtraPoints"))
         {
+            SoundManager.Instance.Bite();
             PowerUps.Instance.ActivateExtraPoints();
             effectCountdown.StartExtraPointsCountdown();
             Destroy(other.gameObject);

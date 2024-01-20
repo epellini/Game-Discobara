@@ -151,6 +151,7 @@ public class GooglePlayLogin : MonoBehaviour
     // Load Google Leaderboard UI
     public void ShowLeaderboard()
     {
+        SoundManager.Instance.ButtonPress();
         if (Social.localUser.authenticated)
         {
             Social.ShowLeaderboardUI();
