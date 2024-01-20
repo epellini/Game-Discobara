@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject menuPanel;
     [SerializeField] private GameObject gamePanel;
     [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private GameObject tutorialPanel;
     [SerializeField] private GameObject crossfadePanel;
     [SerializeField] private TransitionController transitionController;
     private Vector3 TargetDestination = Vector3.zero;
@@ -284,7 +285,7 @@ public class GameManager : MonoBehaviour
         // Handle the previous platform
         if (!isFirstPlatform && previousPlatform != null)
         {
-            Destroy(previousPlatform.gameObject, 0.4f); // Delay destruction
+            Destroy(previousPlatform.gameObject, 0.5f); // Delay destruction
         }
         previousPlatform = CurrentPlatform;
         isFirstPlatform = false;
@@ -373,7 +374,16 @@ public class GameManager : MonoBehaviour
         StartCoroutine(cameraBounceZoom.DeathShake(0.3f, 0.03f));
         playerAnimator.SetTrigger("Lost");
 
-        yield return new WaitForSeconds(0.9f); // The amount of time to wait after player lost animation
+        yield return new WaitForSeconds(0.95f); // The amount of time to wait after player lost animation
+         // 3. Platform Handling
+        if (CurrentPlatform != null && CurrentPlatform != StartPlatform)
+        {
+            Destroy(CurrentPlatform.gameObject);
+        }
+        if (previousPlatform != null && previousPlatform != StartPlatform)
+        {
+            Destroy(previousPlatform.gameObject);
+        }
 
         CurrentState = GameState.GameOver; // Prevent the player from moving after losing
         gamePanel.SetActive(false); // Turn off the game panel
@@ -402,6 +412,8 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator ResetGameCoroutine()
     {
+       
+        //transitionController.PlayTransition();
         // Reset Camera Bounce and Zoom Effects
         // Reset the animation controller
         CameraBounceZoom cameraBounceZoom = Camera.main.GetComponent<CameraBounceZoom>();
@@ -461,5 +473,22 @@ public class GameManager : MonoBehaviour
         StartCoroutine(DeactivateStartPlatformAfterDelay(StartPlatform.gameObject, 2f)); // Set the delay as needed
         StopCoroutine(SpawnPlatform());
         StartCoroutine(SpawnPlatform());
+    }
+
+
+    public void ShowTutorial()
+    {
+        // Show the tutorial panel
+        tutorialPanel.SetActive(true);
+        // Hide the menu panel
+        menuPanel.SetActive(false);
+    }
+
+    public void HideTutorial()
+    {
+        // Hide the tutorial panel
+        tutorialPanel.SetActive(false);
+        // Show the menu panel
+        menuPanel.SetActive(true);
     }
 }
