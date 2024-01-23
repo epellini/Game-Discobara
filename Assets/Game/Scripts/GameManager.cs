@@ -460,6 +460,8 @@ public class GameManager : MonoBehaviour
         CurrentPlatform = StartPlatform;
         previousPlatform = null;
         isFirstPlatform = true;
+        // 6. Score and High Score Reset (if applicable)
+        ScoreManager.Instance.ResetScore();
 
         // 4. UI Elements
         if (gameOverPanel != null) { gameOverPanel.SetActive(false); }
@@ -470,8 +472,6 @@ public class GameManager : MonoBehaviour
         touchEnd = Vector2.zero;
         isSwiping = false;
 
-        // 6. Score and High Score Reset (if applicable)
-        ScoreManager.Instance.ResetScore();
         // ScoreManager.Instance.ResetHighScore(); // If you have a high score system
         StartCoroutine(DeactivateStartPlatformAfterDelay(StartPlatform.gameObject, 2f)); // Set the delay as needed
         StopCoroutine(SpawnPlatform());

@@ -9612,6 +9612,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0391d7b99fcdf164091debd5a81b53a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  musicTracks: []
   _musicSource: {fileID: 2137121390}
   _effectsSource: {fileID: 315741590}
   audioClips:
@@ -10059,7 +10060,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1363137783
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10076,7 +10077,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: -2800}
+  m_AnchoredPosition: {x: 0, y: -5000}
   m_SizeDelta: {x: 968, y: 2048}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1363137784
@@ -10457,7 +10458,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78dfdd1a90ef0a742b4c46cdbfa7aac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _clip: {fileID: 8300000, guid: 379e48e3b78b9274f8d5f6e008e72ecf, type: 3}
 --- !u!1 &1479957603
 GameObject:
   m_ObjectHideFlags: 0

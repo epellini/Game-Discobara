@@ -85,7 +85,6 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-
     public void ShowHighScore() // Called from GameManager.cs on GameOver Screen
     {
         if (newHighScoreAchieved)
@@ -113,6 +112,7 @@ public class ScoreManager : MonoBehaviour
     public void ResetScore()
     {
         currentScore = 0;
+        ShowCurrentScore();
         newHighScoreAchieved = false;
         gameOverCard.SetActive(false);
         newHighScoreCard.SetActive(false);
