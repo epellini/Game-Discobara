@@ -112,14 +112,13 @@ public class SoundManager : MonoBehaviour
     public void RightMove()
     {
         // Define an array of pitches
-        float[] pitches = new float[] { 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.4f, 1.3f, 1.5f  };
+        float[] pitches = new float[] {  1.3f, 1.4f, 1.5f, 1.6f, 1.4f, 1.5f };
 
         // Set the pitch based on the current counter
         _effectsSource.pitch = pitches[pitchCounter];
 
         // Play the sound effect
         _effectsSource.PlayOneShot(audioClips[1]);
-
         // Increment the counter, and reset if it reaches the length of the pitches array
         pitchCounter = (pitchCounter + 1) % pitches.Length;
     }

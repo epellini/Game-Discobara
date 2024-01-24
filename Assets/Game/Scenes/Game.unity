@@ -1085,7 +1085,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 315741591}
-  - component: {fileID: 315741590}
+  - component: {fileID: 315741592}
   m_Layer: 0
   m_Name: Effect Source
   m_TagString: Untagged
@@ -1093,7 +1093,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!82 &315741590
+--- !u!4 &315741591
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 315741589}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1203392108}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &315741592
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1104,7 +1119,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -1189,21 +1204,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!4 &315741591
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 315741589}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1203392108}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &331296326
 GameObject:
   m_ObjectHideFlags: 0
@@ -9611,13 +9611,13 @@ MonoBehaviour:
   musicTracks:
   - {fileID: 8300000, guid: 9080b701c20b88b41987f534517640c1, type: 3}
   _musicSource: {fileID: 2137121390}
-  _effectsSource: {fileID: 315741590}
+  _effectsSource: {fileID: 315741592}
   audioClips:
   - {fileID: 8300000, guid: 379e48e3b78b9274f8d5f6e008e72ecf, type: 3}
-  - {fileID: 8300000, guid: 1c1bb60bc67c8704a8075d4ece66acb9, type: 3}
+  - {fileID: 8300000, guid: 10d4070a8f78f4c448958999938e93f1, type: 3}
   - {fileID: 8300000, guid: 242e673b76c409944b2056d0e2f99ba5, type: 3}
   - {fileID: 8300000, guid: 4622cca9e8d34f14b87879e8560f57ff, type: 3}
-  menuMusic: {fileID: 8300000, guid: 94b60d861e0f72e45932a87c29c1a969, type: 3}
+  menuMusic: {fileID: 8300000, guid: 5341faade0d93c749b8af6b644f4c599, type: 3}
 --- !u!4 &1203392108
 Transform:
   m_ObjectHideFlags: 0
@@ -17089,7 +17089,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
