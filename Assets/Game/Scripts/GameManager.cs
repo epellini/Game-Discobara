@@ -76,6 +76,7 @@ public class GameManager : MonoBehaviour
             gamePanel.SetActive(true);
             gameOverPanel.SetActive(false);
             CurrentState = GameState.ReadyForInput;
+             SoundManager.Instance.RestartMusic();
             CurrentPlatform = StartPlatform;
 
             // Schedule the removal of StartPlatform after a few seconds
@@ -93,8 +94,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
+      private GameState previousState = GameState.Menu;
+
     void Update()
     {
+        // Check for state transition to start music
+        if ((previousState == GameState.Menu || previousState == GameState.GameOver) && CurrentState == GameState.ReadyForInput)
+        {
+            SoundManager.Instance.RestartMusic();
+        }
+
         if (CurrentState == GameState.Menu)
         {
             gameOverPanel.SetActive(false);
@@ -108,6 +117,7 @@ public class GameManager : MonoBehaviour
 
         if (CurrentState == GameState.ReadyForInput) // If the game is ready for input, check for input
         {
+           
             playerAnimator.SetTrigger("Idle");
             if (Input.GetKeyDown(KeyCode.A))
             {
@@ -166,6 +176,8 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+        // Update the previous state at the end of the Update method
+        previousState = CurrentState;
     }
 
     private void HandleSwipe()
@@ -294,6 +306,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator SpawnPlatform()
     {
+        
         while (CurrentState != GameState.GameOver)
         {
             yield return new WaitForSeconds(PowerUps.Instance.isSlowMotionActive ? PowerUps.Instance.slowMotionSpawnDelay : PowerUps.Instance.normalSpawnDelay);
@@ -372,6 +385,7 @@ public class GameManager : MonoBehaviour
         // Play sound effect
         //AudioManager.Instance.PlaySoundEffect(AudioManager.SoundEffect.PlayerFell);
         // Play animation
+        SoundManager.Instance.PlayerDied(); // Plays the death sound effect
         StartCoroutine(cameraBounceZoom.DeathShake(0.3f, 0.03f));
         playerAnimator.SetTrigger("Lost");
 
@@ -408,6 +422,7 @@ public class GameManager : MonoBehaviour
     public void ResetGame() // Restart Button on Game Over Screen
     {
         SoundManager.Instance.ButtonPress();
+        SoundManager.Instance.RestartMusic();
         //cameraBounceZoom.OnPlayerDeath();
         transitionController.PlayTransition();
         StartCoroutine(ResetGameCoroutine());

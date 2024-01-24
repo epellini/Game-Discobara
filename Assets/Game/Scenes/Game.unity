@@ -271,6 +271,50 @@ Transform:
   - {fileID: 1818017530}
   m_Father: {fileID: 408311643}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &69607833
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 69607835}
+  - component: {fileID: 69607834}
+  m_Layer: 0
+  m_Name: MusicManage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &69607834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69607833}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97f751ea949bbff4e89adf67ca192962, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &69607835
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69607833}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.0588807, y: 0.46203673, z: 1.8978665}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &98841418
 GameObject:
   m_ObjectHideFlags: 0
@@ -8160,12 +8204,9 @@ MonoBehaviour:
   rotationSpeed: 100
   movedAnimations:
   - Moved1
-  - Moved2
-  - Moved3
-  - Moved1
-  - Moved1
   playerFellParticles: {fileID: 0}
   playerAnimator: {fileID: 1817947868}
+  musicManager: {fileID: 69607834}
   cameraBounceZoom: {fileID: 963194230}
 --- !u!4 &770550488
 Transform:
@@ -17477,3 +17518,4 @@ SceneRoots:
   - {fileID: 149965974}
   - {fileID: 751950670}
   - {fileID: 1203392108}
+  - {fileID: 69607835}
