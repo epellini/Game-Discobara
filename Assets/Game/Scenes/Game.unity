@@ -271,50 +271,6 @@ Transform:
   - {fileID: 1818017530}
   m_Father: {fileID: 408311643}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &69607833
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 69607835}
-  - component: {fileID: 69607834}
-  m_Layer: 0
-  m_Name: MusicManage
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &69607834
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 69607833}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97f751ea949bbff4e89adf67ca192962, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &69607835
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 69607833}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.0588807, y: 0.46203673, z: 1.8978665}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &98841418
 GameObject:
   m_ObjectHideFlags: 0
@@ -629,10 +585,10 @@ MonoBehaviour:
   gameManager: {fileID: 770550487}
   powerUpSlowMotionPrefab: {fileID: 8247843832711000007, guid: fa86d9a0cc7f17340af303da2fb64f60, type: 3}
   powerUpExtraPointsPrefab: {fileID: 1125202155953082, guid: 671c30d04458efd4586878c73bcdd851, type: 3}
-  normalSpawnDelay: 1
+  normalSpawnDelay: 0.8
   slowMotionSpawnDelay: 2
   isSlowMotionActive: 0
-  extraPointsSpawnChance: 0.1
+  extraPointsSpawnChance: 0.05
   isExtraPointsActive: 0
 --- !u!1 &226080993
 GameObject:
@@ -8206,7 +8162,6 @@ MonoBehaviour:
   - Moved1
   playerFellParticles: {fileID: 0}
   playerAnimator: {fileID: 1817947868}
-  musicManager: {fileID: 69607834}
   cameraBounceZoom: {fileID: 963194230}
 --- !u!4 &770550488
 Transform:
@@ -9653,7 +9608,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0391d7b99fcdf164091debd5a81b53a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  musicTracks: []
+  musicTracks:
+  - {fileID: 8300000, guid: 9080b701c20b88b41987f534517640c1, type: 3}
   _musicSource: {fileID: 2137121390}
   _effectsSource: {fileID: 315741590}
   audioClips:
@@ -9661,6 +9617,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1c1bb60bc67c8704a8075d4ece66acb9, type: 3}
   - {fileID: 8300000, guid: 242e673b76c409944b2056d0e2f99ba5, type: 3}
   - {fileID: 8300000, guid: 4622cca9e8d34f14b87879e8560f57ff, type: 3}
+  menuMusic: {fileID: 8300000, guid: 94b60d861e0f72e45932a87c29c1a969, type: 3}
 --- !u!4 &1203392108
 Transform:
   m_ObjectHideFlags: 0
@@ -9689,7 +9646,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -17518,4 +17475,3 @@ SceneRoots:
   - {fileID: 149965974}
   - {fileID: 751950670}
   - {fileID: 1203392108}
-  - {fileID: 69607835}

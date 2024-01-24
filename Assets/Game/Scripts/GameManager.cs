@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Xml.Serialization;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
 
@@ -43,6 +44,7 @@ public class GameManager : MonoBehaviour
 
     public Animator playerAnimator;
 
+
     void Awake()
     {
         if (Instance == null)
@@ -55,6 +57,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
         // Before the game starts, set the current state to Menu
+        previousState = GameState.GameOver;
         CurrentState = GameState.Menu;
     }
 
@@ -76,7 +79,7 @@ public class GameManager : MonoBehaviour
             gamePanel.SetActive(true);
             gameOverPanel.SetActive(false);
             CurrentState = GameState.ReadyForInput;
-             SoundManager.Instance.RestartMusic();
+            SoundManager.Instance.RestartMusic();
             CurrentPlatform = StartPlatform;
 
             // Schedule the removal of StartPlatform after a few seconds
@@ -94,20 +97,42 @@ public class GameManager : MonoBehaviour
         }
     }
 
-      private GameState previousState = GameState.Menu;
-
+    private GameState previousState = GameState.Menu;
+       private bool gameMusicStarted = false;
+    private bool menuMusicStopped = false;
     void Update()
     {
+
+        if (menuPanel.activeSelf || tutorialPanel.activeSelf)
+        {
+            if (!SoundManager.Instance.IsMenuMusicPlaying())
+            {
+                SoundManager.Instance.PlayMenuMusic();
+            }
+            gameMusicStarted = false;
+            menuMusicStopped = false;
+        }
+        else if (!menuMusicStopped)
+        {
+            SoundManager.Instance.StopMenuMusic();
+            menuMusicStopped = true;
+        }
+
+         // Handle game music for gamePanel and gameOverPanel
+        if ((gamePanel.activeSelf || gameOverPanel.activeSelf) && !gameMusicStarted)
+        {
+            SoundManager.Instance.RestartMusic();
+            gameMusicStarted = true;
+        }
+
         // Check for state transition to start music
         if ((previousState == GameState.Menu || previousState == GameState.GameOver) && CurrentState == GameState.ReadyForInput)
         {
-            SoundManager.Instance.RestartMusic();
         }
 
         if (CurrentState == GameState.Menu)
         {
             gameOverPanel.SetActive(false);
-            return;
         }
 
         if (CurrentState == GameState.GameOver)
@@ -117,7 +142,6 @@ public class GameManager : MonoBehaviour
 
         if (CurrentState == GameState.ReadyForInput) // If the game is ready for input, check for input
         {
-           
             playerAnimator.SetTrigger("Idle");
             if (Input.GetKeyDown(KeyCode.A))
             {
@@ -306,7 +330,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator SpawnPlatform()
     {
-        
+
         while (CurrentState != GameState.GameOver)
         {
             yield return new WaitForSeconds(PowerUps.Instance.isSlowMotionActive ? PowerUps.Instance.slowMotionSpawnDelay : PowerUps.Instance.normalSpawnDelay);
@@ -421,8 +445,8 @@ public class GameManager : MonoBehaviour
 
     public void ResetGame() // Restart Button on Game Over Screen
     {
-        SoundManager.Instance.ButtonPress();
         SoundManager.Instance.RestartMusic();
+        SoundManager.Instance.ButtonPress();
         //cameraBounceZoom.OnPlayerDeath();
         transitionController.PlayTransition();
         StartCoroutine(ResetGameCoroutine());

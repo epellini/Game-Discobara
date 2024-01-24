@@ -8,6 +8,7 @@ public class SoundManager : MonoBehaviour
     public List<AudioClip> musicTracks;
     [SerializeField] private AudioSource _musicSource, _effectsSource;
     [SerializeField] public AudioClip[] audioClips;
+    [SerializeField] private AudioClip menuMusic;
 
     private void Awake()
     {
@@ -22,14 +23,43 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    public void PlayMenuMusic()
+    {
+        if (menuMusic != null)
+        {
+            _musicSource.clip = menuMusic;
+            _musicSource.loop = true; // Loop the menu music
+            _musicSource.Play();
+        }
+    }
+
+    public void StopMenuMusic()
+    {
+        _musicSource.Stop();
+    }
+
+    public void StopGameMusic()
+    {
+        _musicSource.Stop();
+    }
+
     public void PlayerDied()
     {
         StartCoroutine(PlayDeathSound());
     }
 
+    public bool IsMenuMusicPlaying()
+    {
+        return _musicSource.isPlaying && _musicSource.clip == menuMusic;
+    }
+
+    public bool IsGameMusicPlaying()
+    {
+        return _musicSource.isPlaying && _musicSource.clip != menuMusic;
+    }
     private IEnumerator PlayDeathSound()
     {
-        float duration = 3f; // Duration of the effect in seconds
+        float duration = 2f; // Duration of the effect in seconds
         float startPitch = _musicSource.pitch;
         float endPitch = 0.5f; // Lower pitch to create 'melting' sound
         float startVolume = _musicSource.volume;
@@ -56,6 +86,7 @@ public class SoundManager : MonoBehaviour
 
     public void RestartMusic()
     {
+        StopAllCoroutines();
         _musicSource.Stop(); // Stop current music
         _musicSource.pitch = 1f; // Reset pitch
         _musicSource.volume = 1f; // Reset volume
@@ -68,6 +99,7 @@ public class SoundManager : MonoBehaviour
         {
             _musicSource.clip = musicTracks[Random.Range(0, musicTracks.Count)];
             _musicSource.Play();
+            _musicSource.loop = true; // Loop the menu music
         }
     }
 
@@ -80,7 +112,7 @@ public class SoundManager : MonoBehaviour
     public void RightMove()
     {
         // Define an array of pitches
-        float[] pitches = new float[] { 1.0f, 1.1f, 1.2f, 1.3f, 1.4f };
+        float[] pitches = new float[] { 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.4f, 1.3f, 1.5f  };
 
         // Set the pitch based on the current counter
         _effectsSource.pitch = pitches[pitchCounter];
@@ -101,6 +133,5 @@ public class SoundManager : MonoBehaviour
     {
         _effectsSource.PlayOneShot(audioClips[3]);
     }
-
 
 }
