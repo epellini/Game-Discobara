@@ -128,6 +128,11 @@ public class SoundManager : MonoBehaviour
         _effectsSource.PlayOneShot(audioClips[2]);
     }
 
+        public void NewHighScore()
+    {
+        _effectsSource.PlayOneShot(audioClips[4]);
+    }
+
     public void Bite()
     {
         _effectsSource.PlayOneShot(audioClips[3]);

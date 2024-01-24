@@ -19,6 +19,7 @@ public class ScoreManager : MonoBehaviour
     public GameObject particleEffectPrefab;
     public GameObject gameOverCard; // Assign this in the inspector
     public GameObject newHighScoreCard;
+    public Animator scoreAnimator;
 
     void Awake()
     {
@@ -38,6 +39,7 @@ public class ScoreManager : MonoBehaviour
 
     public void IncrementScore()
     {
+        scoreAnimator.SetTrigger("Point");
         int scoreIncrement = PowerUps.Instance.isExtraPointsActive ? 2 : 1;
         currentScore += scoreIncrement; // Increase score by 2 if extra points are active, otherwise by 1
         ShowCurrentScore();
@@ -75,6 +77,7 @@ public class ScoreManager : MonoBehaviour
     {
         if (newHighScoreAchieved)
         {
+            SoundManager.Instance.NewHighScore();
             newHighScoreCard.SetActive(true);
             gameOverCard.SetActive(false);
         }
